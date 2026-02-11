@@ -7,10 +7,10 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def download_split(split):
-    DATA_DIR = os.path.join(SCRIPT_DIR, split)
+    data_dir = os.path.join(SCRIPT_DIR, split)
 
-    os.makedirs(DATA_DIR, exist_ok=True)
-    print("Saving to:", DATA_DIR)
+    os.makedirs(data_dir, exist_ok=True)
+    print("Saving to:", data_dir)
 
     url = BASE_URL + split + "/"
     page = requests.get(url).text
@@ -20,7 +20,7 @@ def download_split(split):
         href = link.get("href")
         if href and href.endswith(".nc"):
             file_url = url + href
-            path = os.path.join(DATA_DIR, href)
+            path = os.path.join(data_dir, href)
             print("Downloading", href)
             with requests.get(file_url, stream=True) as r:
                 with open(path, "wb") as f:
