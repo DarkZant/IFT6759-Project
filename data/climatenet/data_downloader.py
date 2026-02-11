@@ -18,7 +18,7 @@ def download_split(split):
 
     for link in soup.find_all("a"):
         href = link.get("href")
-        if href.endswith(".nc"):
+        if href and href.endswith(".nc"):
             file_url = url + href
             path = os.path.join(DATA_DIR, href)
             print("Downloading", href)
