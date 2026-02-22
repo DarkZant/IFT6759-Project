@@ -2,7 +2,14 @@
 __pycache__/
 *.py[codz]
 *$py.class
+*.pyc
 
+# Other gits for now
+/ClimateNet2020
+/ClimateNet2023
+
+# .DS_Store
+.DS_Store
 # Data
 *.nc
 

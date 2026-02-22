@@ -1,1 +1,11 @@
 bs4
+bs4
+requests
+torch
+xarray
+tqdm
+psutil
+matplotlib
+cartropy
+haversine
+netcdf4
