@@ -6,6 +6,5 @@ xarray
 tqdm
 psutil
 matplotlib
-cartropy
 haversine
 netcdf4
