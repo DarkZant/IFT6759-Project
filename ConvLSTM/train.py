@@ -1,0 +1,147 @@
+import glob
+import json
+import os
+import torch
+from torch.utils.data import DataLoader
+
+from data.dataset import ClimateNetDataset
+from ConvLSTM.convlstm_cell import ConvLSTM
+
+# Config
+
+TRAIN_FOLDER   = "data/climatenet_engineered/train"
+CHECKPOINT_DIR = "checkpoints"
+
+# All 20 available channels:
+#   TMQ, U850, V850, UBOT, VBOT, QREFHT, PS, PSL, T200, T500,
+#   PRECT, TS, TREFHT, Z1000, Z200, ZBOT, WS850, WSBOT, VRT850, VRTBOT
+
+# Set to None to use all 20, or list any subset:
+SELECTED_CHANNELS = None
+
+
+
+HIDDEN_DIM  = 64
+KERNEL_SIZE = 3
+NUM_LAYERS  = 2
+NUM_CLASSES = 3
+TIME_STEPS  = 10
+
+VAL_SPLIT   = 0.2
+BATCH_SIZE  = 2
+NUM_EPOCHS  = 10
+LR          = 1e-3
+
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+all_files = sorted(glob.glob(TRAIN_FOLDER + "/*.nc"))
+assert len(all_files) > 0, f"No .nc files found in {TRAIN_FOLDER}"
+
+split_idx   = int(len(all_files) * (1 - VAL_SPLIT))
+train_files = all_files[:split_idx]
+val_files   = all_files[split_idx:]
+
+print(f"Files — train: {len(train_files)}, val: {len(val_files)}")
+
+
+# Datasets and DataLoaders
+
+train_dataset = ClimateNetDataset(
+    data=train_files, folder=TRAIN_FOLDER,
+    time_steps=TIME_STEPS, selected_channels=SELECTED_CHANNELS
+)
+val_dataset = ClimateNetDataset(
+    data=val_files, folder=TRAIN_FOLDER,
+    time_steps=TIME_STEPS, selected_channels=SELECTED_CHANNELS
+)
+
+
+INPUT_DIM = len(train_dataset.channels)
+print(f"Using {INPUT_DIM} channels: {train_dataset.channels}")
+
+NUM_WORKERS  = int(os.environ.get("SLURM_CPUS_PER_TASK", 0))
+train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=NUM_WORKERS)
+val_loader   = DataLoader(val_dataset,   batch_size=BATCH_SIZE, shuffle=False, num_workers=NUM_WORKERS)
+
+print(f"Train batches: {len(train_loader)}, Val batches: {len(val_loader)}")
+
+# Class weights
+
+weights_dict  = train_dataset.compute_classes_weights()
+class_weights = torch.tensor(
+    [weights_dict.get(i, 1.0) for i in range(NUM_CLASSES)],
+    dtype=torch.float32
+)
+print(f"Class weights — BG: {class_weights[0]:.3f}, TC: {class_weights[1]:.3f}, AR: {class_weights[2]:.3f}")
+
+
+# Model and optimizer
+
+model = ConvLSTM(
+    input_dim=INPUT_DIM,
+    hidden_dim=HIDDEN_DIM,
+    kernel_size=KERNEL_SIZE,
+    num_layers=NUM_LAYERS,
+    num_classes=NUM_CLASSES,
+    class_weights=class_weights,
+)
+model.to(DEVICE)
+print(f"Model on {DEVICE}")
+print(f"Trainable params: {sum(p.numel() for p in model.parameters() if p.requires_grad):,}")
+
+optimizer = torch.optim.Adam(model.parameters(), lr=LR)
+
+
+# Train — one epoch at a time to record history
+
+os.makedirs(CHECKPOINT_DIR, exist_ok=True)
+
+history = {
+    "train_loss":    [],
+    "val_mean_iou":  [],
+    "val_iou_bg":    [],
+    "val_iou_tc":    [],
+    "val_iou_ar":    [],
+}
+
+print(f"\nStarting training for {NUM_EPOCHS} epochs...")
+for epoch in range(1, NUM_EPOCHS + 1):
+    train_loss = model.fit(train_loader, optimizer, num_epoch=1, device=DEVICE)
+    mean_iou, per_class_iou = model.evaluate(val_loader, device=DEVICE)
+
+    history["train_loss"].append(train_loss)
+    history["val_mean_iou"].append(mean_iou)
+    history["val_iou_bg"].append(per_class_iou[0])
+    history["val_iou_tc"].append(per_class_iou[1])
+    history["val_iou_ar"].append(per_class_iou[2])
+
+    print(f"Epoch {epoch}/{NUM_EPOCHS} — loss: {train_loss:.4f} | "
+          f"val mIoU: {mean_iou:.4f} (BG {per_class_iou[0]:.4f}, "
+          f"TC {per_class_iou[1]:.4f}, AR {per_class_iou[2]:.4f})")
+
+history_path = os.path.join(CHECKPOINT_DIR, "history.json")
+with open(history_path, "w") as f:
+    json.dump(history, f, indent=2)
+print(f"\nHistory saved to {history_path}")
+
+
+# Saves
+
+checkpoint_path = os.path.join(CHECKPOINT_DIR, "convlstm_final.pt")
+torch.save({
+    "model_state_dict":      model.state_dict(),
+    "optimizer_state_dict":  optimizer.state_dict(),
+    "config": {
+        "input_dim":         INPUT_DIM,
+        "selected_channels": train_dataset.channels,
+        "hidden_dim":        HIDDEN_DIM,
+        "kernel_size":       KERNEL_SIZE,
+        "num_layers":        NUM_LAYERS,
+        "num_classes":       NUM_CLASSES,
+        "time_steps":        TIME_STEPS,
+    },
+    "val_mean_iou":      mean_iou,
+    "val_per_class_iou": per_class_iou,
+}, checkpoint_path)
+print(f"Checkpoint saved to {checkpoint_path}")
