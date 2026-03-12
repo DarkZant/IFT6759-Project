@@ -88,6 +88,21 @@ class ConvLSTM(nn.Module):
         ious = self.iou_per_class(pred, targets)
         return sum(ious) / len(ious)
 
+    def recall_per_class(self, pred, targets):
+        pred_labels = torch.argmax(pred, dim=1)
+        recalls = []
+        for cls in range(self.num_classes):
+            pred_cls    = (pred_labels == cls)
+            target_cls  = (targets == cls)
+            tp          = (pred_cls & target_cls).sum().item()
+            actual      = target_cls.sum().item()
+            recalls.append(tp / actual if actual > 0 else 0.0)
+        return recalls
+
+    def mean_recall(self, pred, targets):
+        recalls = self.recall_per_class(pred, targets)
+        return sum(recalls) / len(recalls)
+
     def dice_loss(self, pred, targets):
         probs = torch.softmax(pred, dim=1)
         dice_loss = 0
@@ -123,17 +138,24 @@ class ConvLSTM(nn.Module):
 
     def evaluate(self, dataloader, device):
         self.eval()
-        total_iou = 0
-        all_per_class_iou = []
+        total_iou    = 0
+        total_recall = 0
+        all_per_class_iou    = []
+        all_per_class_recall = []
         with torch.no_grad():
             for x, targets in dataloader:
                 x, targets = x.to(device), targets.to(device)
                 pred = self.forward(x)
-                total_iou += self.mean_iou(pred, targets)
-                all_per_class_iou.append(self.iou_per_class(pred, targets))  # fix: collect inside loop
-        mean_iou = total_iou / len(dataloader)
-        per_class_iou = [sum(cls) / len(cls) for cls in zip(*all_per_class_iou)]  # average per class
-        return mean_iou, per_class_iou
+                total_iou    += self.mean_iou(pred, targets)
+                total_recall += self.mean_recall(pred, targets)
+                all_per_class_iou.append(self.iou_per_class(pred, targets))
+                all_per_class_recall.append(self.recall_per_class(pred, targets))
+        n = len(dataloader)
+        mean_iou         = total_iou    / n
+        mean_recall      = total_recall / n
+        per_class_iou    = [sum(cls) / len(cls) for cls in zip(*all_per_class_iou)]
+        per_class_recall = [sum(cls) / len(cls) for cls in zip(*all_per_class_recall)]
+        return mean_iou, per_class_iou, mean_recall, per_class_recall
     
     def predict(self, x):
         self.eval()

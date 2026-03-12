@@ -8,9 +8,10 @@ import os
 from tqdm import tqdm
 
 class ClimateNetDataset(Dataset):
-    def __init__(self, data, folder, time_steps=10, selected_channels=None):
+    def __init__(self, data, folder, time_steps=10, selected_channels=None, train_folder=None):
         self.data = data
-        first_file = sorted(glob.glob(folder + '/*.nc'))[0]
+        stats_folder = train_folder if train_folder is not None else folder
+        first_file = sorted(glob.glob(stats_folder + '/*.nc'))[0]
         ds = xr.open_dataset(first_file)
         all_channels = [var for var in ds.data_vars if var != 'LABELS']
         ds.close()
@@ -21,7 +22,7 @@ class ClimateNetDataset(Dataset):
         else:
             self.channels = all_channels
         self.time_steps = time_steps
-        self.means, self.stds = self.compute_mean_per_variable(folder, cache_stats='data/stats.json')
+        self.means, self.stds = self.compute_mean_per_variable(stats_folder, cache_stats='data/stats.json')
 
     def __len__(self):
         return len(self.data) - self.time_steps + 1

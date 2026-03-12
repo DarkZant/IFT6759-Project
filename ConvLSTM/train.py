@@ -98,27 +98,35 @@ optimizer = torch.optim.Adam(model.parameters(), lr=LR)
 os.makedirs(CHECKPOINT_DIR, exist_ok=True)
 
 history = {
-    "train_loss":    [],
-    "val_mean_iou":  [],
-    "val_iou_bg":    [],
-    "val_iou_tc":    [],
-    "val_iou_ar":    [],
+    "train_loss":       [],
+    "val_mean_iou":     [],
+    "val_iou_bg":       [],
+    "val_iou_tc":       [],
+    "val_iou_ar":       [],
+    "val_mean_recall":  [],
+    "val_recall_bg":    [],
+    "val_recall_tc":    [],
+    "val_recall_ar":    [],
 }
 
 print(f"\nStarting training for {NUM_EPOCHS} epochs...")
 for epoch in range(1, NUM_EPOCHS + 1):
     train_loss = model.fit(train_loader, optimizer, num_epoch=1, device=DEVICE)
-    mean_iou, per_class_iou = model.evaluate(val_loader, device=DEVICE)
+    mean_iou, per_class_iou, mean_recall, per_class_recall = model.evaluate(val_loader, device=DEVICE)
 
     history["train_loss"].append(train_loss)
     history["val_mean_iou"].append(mean_iou)
     history["val_iou_bg"].append(per_class_iou[0])
     history["val_iou_tc"].append(per_class_iou[1])
     history["val_iou_ar"].append(per_class_iou[2])
+    history["val_mean_recall"].append(mean_recall)
+    history["val_recall_bg"].append(per_class_recall[0])
+    history["val_recall_tc"].append(per_class_recall[1])
+    history["val_recall_ar"].append(per_class_recall[2])
 
     print(f"Epoch {epoch}/{NUM_EPOCHS} — loss: {train_loss:.4f} | "
-          f"val mIoU: {mean_iou:.4f} (BG {per_class_iou[0]:.4f}, "
-          f"TC {per_class_iou[1]:.4f}, AR {per_class_iou[2]:.4f})")
+          f"val mIoU: {mean_iou:.4f} (BG {per_class_iou[0]:.4f}, TC {per_class_iou[1]:.4f}, AR {per_class_iou[2]:.4f}) | "
+          f"val recall: {mean_recall:.4f} (BG {per_class_recall[0]:.4f}, TC {per_class_recall[1]:.4f}, AR {per_class_recall[2]:.4f})")
 
 history_path = os.path.join(CHECKPOINT_DIR, "history.json")
 with open(history_path, "w") as f:
@@ -141,7 +149,9 @@ torch.save({
         "num_classes":       NUM_CLASSES,
         "time_steps":        TIME_STEPS,
     },
-    "val_mean_iou":      mean_iou,
-    "val_per_class_iou": per_class_iou,
+    "val_mean_iou":        mean_iou,
+    "val_per_class_iou":   per_class_iou,
+    "val_mean_recall":     mean_recall,
+    "val_per_class_recall": per_class_recall,
 }, checkpoint_path)
 print(f"Checkpoint saved to {checkpoint_path}")
