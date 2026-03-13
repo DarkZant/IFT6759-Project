@@ -66,13 +66,8 @@ val_loader   = DataLoader(val_dataset,   batch_size=BATCH_SIZE, shuffle=False, n
 
 print(f"Train batches: {len(train_loader)}, Val batches: {len(val_loader)}")
 
-# Class weights
-
-weights_dict  = train_dataset.compute_classes_weights()
-class_weights = torch.tensor(
-    [weights_dict.get(i, 1.0) for i in range(NUM_CLASSES)],
-    dtype=torch.float32
-)
+# Class weights — from ClimateNet dataset (BG 93.865%, TC 0.462%, AR 5.674%)
+class_weights = torch.tensor([0.355, 72.171, 5.875], dtype=torch.float32)
 print(f"Class weights — BG: {class_weights[0]:.3f}, TC: {class_weights[1]:.3f}, AR: {class_weights[2]:.3f}")
 
 
