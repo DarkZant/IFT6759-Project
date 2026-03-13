@@ -60,7 +60,7 @@ val_dataset = ClimateNetDataset(
 INPUT_DIM = len(train_dataset.channels)
 print(f"Using {INPUT_DIM} channels: {train_dataset.channels}")
 
-NUM_WORKERS  = int(os.environ.get("SLURM_CPUS_PER_TASK", 0))
+NUM_WORKERS  = 0  # h5netcdf is not fork-safe; multiprocessing workers crash
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=NUM_WORKERS)
 val_loader   = DataLoader(val_dataset,   batch_size=BATCH_SIZE, shuffle=False, num_workers=NUM_WORKERS)
 

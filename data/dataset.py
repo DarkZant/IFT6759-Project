@@ -1,3 +1,4 @@
+import gc
 import torch
 from torch.utils.data import Dataset
 import glob
@@ -33,16 +34,16 @@ class ClimateNetDataset(Dataset):
         mean_arr = np.array([self.means[ch] for ch in self.channels])
         std_arr  = np.array([self.stds[ch]  for ch in self.channels])
         for file in files:
-            ds = xr.open_dataset(file, engine='h5netcdf')
-            data = np.stack([ds[channel].values.squeeze()
-                             for channel in self.channels], axis=0)
-            label = ds['LABELS'].values
+            with xr.open_dataset(file, engine='h5netcdf') as ds:
+                data = np.stack([ds[channel].values.squeeze()
+                                 for channel in self.channels], axis=0)
+                label = ds['LABELS'].values
 
             normalized_data = (data - mean_arr[:, None, None]) / (std_arr[:, None, None] + 1e-8)
 
             stacked_data.append(normalized_data)
             stacked_label.append(label)
-            ds.close()
+            gc.collect()
         return torch.from_numpy(np.stack(stacked_data).astype(np.float32)), torch.from_numpy(stacked_label[-1].astype(np.int64))
         
 
