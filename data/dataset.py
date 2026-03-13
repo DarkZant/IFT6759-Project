@@ -87,7 +87,13 @@ class ClimateNetDataset(Dataset):
 
         return stats['means'], stats['stds']
 
-    def compute_classes_weights(self):
+    def compute_classes_weights(self, cache_stats='data/stats.json'):
+        if os.path.exists(cache_stats):
+            with open(cache_stats, 'r') as f:
+                stats = json.load(f)
+            if 'class_weights' in stats:
+                return {int(k): v for k, v in stats['class_weights'].items()}
+
         class_counts = np.zeros(3, dtype=np.int64)
         for file in self.data:
             ds = xr.open_dataset(file, engine='h5netcdf')
@@ -98,6 +104,16 @@ class ClimateNetDataset(Dataset):
         total_pixels = class_counts.sum()
         class_weight = {i: total_pixels / (3 * count)
                         for i, count in enumerate(class_counts) if count > 0}
+
+        if os.path.exists(cache_stats):
+            with open(cache_stats, 'r') as f:
+                stats = json.load(f)
+        else:
+            stats = {'means': {}, 'stds': {}}
+        stats['class_weights'] = class_weight
+        with open(cache_stats, 'w') as f:
+            json.dump(stats, f, indent=2)
+
         return class_weight
 
 if __name__ == "__main__":
