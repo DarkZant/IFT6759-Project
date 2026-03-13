@@ -16,15 +16,14 @@ CHECKPOINT_DIR = os.environ.get("CHECKPOINT_DIR", "checkpoints")
 #   PRECT, TS, TREFHT, Z1000, Z200, ZBOT, WS850, WSBOT, VRT850, VRTBOT
 
 # Set to None to use all 20, or list any subset:
-SELECTED_CHANNELS = None
+# Using 4 channels (same as CGNet baseline) to fit in 4.75 GB MIG GPU
+SELECTED_CHANNELS = ['TMQ', 'U850', 'V850', 'PSL']
 
-
-
-HIDDEN_DIM  = 32
+HIDDEN_DIM  = 16
 KERNEL_SIZE = 3
 NUM_LAYERS  = 1
 NUM_CLASSES = 3
-TIME_STEPS  = 5
+TIME_STEPS  = 3
 
 VAL_SPLIT   = 0.2
 BATCH_SIZE  = 1
