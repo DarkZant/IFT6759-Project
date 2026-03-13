@@ -2,10 +2,6 @@ import glob
 import json
 import os
 import torch
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
 import numpy as np
 from torch.utils.data import DataLoader
 
@@ -164,7 +160,7 @@ torch.save({
 print(f"Checkpoint saved to {checkpoint_path}")
 
 
-# Visualization — one val sample: input channel, predicted mask, ground truth mask
+# Save one val sample for local visualization
 
 model.eval()
 sample_x, sample_y = val_dataset[0]          # (T, C, H, W), (H, W)
@@ -173,30 +169,7 @@ x_in = sample_x.unsqueeze(0).to(DEVICE)      # (1, T, C, H, W)
 with torch.no_grad():
     pred_mask = model.predict(x_in)[0].cpu().numpy()   # (H, W)
 
-gt_mask   = sample_y.numpy()                           # (H, W)
-input_img = sample_x[0, 0].numpy()                    # first time step, first channel
-
-cmap = mcolors.ListedColormap(["#1f77b4", "#d62728", "#2ca02c"])  # BG, TC, AR
-norm = mcolors.BoundaryNorm([0, 1, 2, 3], cmap.N)
-
-fig, axes = plt.subplots(1, 3, figsize=(18, 5))
-
-axes[0].imshow(input_img, cmap="viridis")
-axes[0].set_title(f"Input: {train_dataset.channels[0]} (t=0)")
-axes[0].axis("off")
-
-im = axes[1].imshow(pred_mask, cmap=cmap, norm=norm)
-axes[1].set_title("Predicted mask")
-axes[1].axis("off")
-
-axes[2].imshow(gt_mask, cmap=cmap, norm=norm)
-axes[2].set_title("Ground truth mask")
-axes[2].axis("off")
-
-cbar = fig.colorbar(im, ax=axes, ticks=[0.5, 1.5, 2.5], fraction=0.015, pad=0.02)
-cbar.ax.set_yticklabels(["Background", "Tropical Cyclone", "Atmospheric River"])
-
-viz_path = os.path.join(CHECKPOINT_DIR, "sample_prediction.png")
-plt.savefig(viz_path, dpi=150, bbox_inches="tight")
-plt.close()
-print(f"Visualization saved to {viz_path}")
+np.save(os.path.join(CHECKPOINT_DIR, "sample_input.npy"),  sample_x[0, 0].numpy())
+np.save(os.path.join(CHECKPOINT_DIR, "sample_pred.npy"),   pred_mask)
+np.save(os.path.join(CHECKPOINT_DIR, "sample_gt.npy"),     sample_y.numpy())
+print(f"Sample arrays saved to {CHECKPOINT_DIR} (input/pred/gt .npy)")
