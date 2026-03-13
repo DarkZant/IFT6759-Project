@@ -15,7 +15,7 @@ echo "Job ID: $SLURM_JOB_ID"
 
 module --force purge
 export RSNT_ARCH=avx2
-module load StdEnv/2020 gcc/9.3.0 cuda/11.4 python/3.10
+module load StdEnv/2020 gcc/9.3.0 cuda/11.4 python/3.10 mpi4py/3.1.3
 
 PROJECT_DIR=/home/remilalonde/Project/IFT6759-Project
 source $PROJECT_DIR/.venv/bin/activate
