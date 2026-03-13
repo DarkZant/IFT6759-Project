@@ -12,7 +12,7 @@ class ClimateNetDataset(Dataset):
         self.data = data
         stats_folder = train_folder if train_folder is not None else folder
         first_file = sorted(glob.glob(stats_folder + '/*.nc'))[0]
-        ds = xr.open_dataset(first_file, engine='h5netcdf')
+        ds = xr.load_dataset(first_file)
         all_channels = [var for var in ds.data_vars if var != 'LABELS']
         ds.close()
         if selected_channels is not None:
@@ -34,10 +34,12 @@ class ClimateNetDataset(Dataset):
         mean_arr = np.array([self.means[ch] for ch in self.channels])
         std_arr  = np.array([self.stds[ch]  for ch in self.channels])
         for file in files:
-            with xr.open_dataset(file, engine='h5netcdf') as ds:
-                data = np.stack([ds[channel].values.squeeze()
-                                 for channel in self.channels], axis=0)
-                label = ds['LABELS'].values
+            ds = xr.load_dataset(file)
+            data = np.stack([ds[channel].values.squeeze()
+                             for channel in self.channels], axis=0)
+            label = ds['LABELS'].values.copy()
+            ds.close()
+            del ds
 
             normalized_data = (data - mean_arr[:, None, None]) / (std_arr[:, None, None] + 1e-8)
 
@@ -67,7 +69,7 @@ class ClimateNetDataset(Dataset):
             files = sorted(glob.glob(folder + '/*.nc'))
             for file in tqdm(files, desc="stats pass", unit="file"):
                 tqdm.write(f"  {os.path.basename(file)}")
-                ds = xr.open_dataset(file, engine='h5netcdf')
+                ds = xr.load_dataset(file)
                 for ch in missing:
                     data = ds[ch].values.flatten().astype(np.float64)
                     sums[ch]    += data.sum()
@@ -99,7 +101,7 @@ class ClimateNetDataset(Dataset):
         sample = self.data[::step]
         class_counts = np.zeros(3, dtype=np.int64)
         for file in sample:
-            ds = xr.open_dataset(file, engine='h5netcdf')
+            ds = xr.load_dataset(file)
             labels = ds['LABELS'].values.flatten().astype(int)
             counts = np.bincount(labels, minlength=3)
             class_counts += counts

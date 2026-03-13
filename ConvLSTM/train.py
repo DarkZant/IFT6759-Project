@@ -7,10 +7,9 @@ from torch.utils.data import DataLoader
 from data.dataset import ClimateNetDataset
 from ConvLSTM.convlstm_cell import ConvLSTM
 
-# Config
-
-TRAIN_FOLDER   = "data/climatenet_engineered/train"
-CHECKPOINT_DIR = "checkpoints"
+# Config — TRAIN_FOLDER can be overridden via env var (set in submit.sh for HPC)
+TRAIN_FOLDER   = os.environ.get("TRAIN_FOLDER", "data/climatenet_engineered/train")
+CHECKPOINT_DIR = os.environ.get("CHECKPOINT_DIR", "checkpoints")
 
 # All 20 available channels:
 #   TMQ, U850, V850, UBOT, VBOT, QREFHT, PS, PSL, T200, T500,
