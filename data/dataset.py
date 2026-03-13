@@ -8,7 +8,7 @@ import json
 import os
 from tqdm import tqdm
 class ClimateNetDataset(Dataset):
-    def __init__(self, data, folder, time_steps=10, selected_channels=None, train_folder=None, preload=False):
+    def __init__(self, data, folder, time_steps=10, selected_channels=None, train_folder=None, preload=False, npy_folder=None):
         self.data = data
         stats_folder = train_folder if train_folder is not None else folder
         first_file = sorted(glob.glob(stats_folder + '/*.nc'))[0]
@@ -26,26 +26,48 @@ class ClimateNetDataset(Dataset):
         self._frames = None
         self._labels = None
         if preload:
-            self._preload()
+            self._preload(npy_folder=npy_folder)
 
     def __len__(self):
         return len(self.data) - self.time_steps + 1
 
-    def _preload(self):
-        print(f"Preloading {len(self.data)} files into RAM...")
+    def _preload(self, npy_folder=None):
         mean_arr = np.array([self.means[ch] for ch in self.channels])
         std_arr  = np.array([self.stds[ch]  for ch in self.channels])
         frames, labels = [], []
-        for file in tqdm(self.data, desc="preload", unit="file"):
-            ds = xr.load_dataset(file)
-            data = np.stack([ds[ch].values.squeeze() for ch in self.channels], axis=0)
-            label = ds['LABELS'].values.squeeze().copy()
-            ds.close()
-            del ds
-            normalized = (data - mean_arr[:, None, None]) / (std_arr[:, None, None] + 1e-8)
-            frames.append(normalized.astype(np.float32))
-            labels.append(label.astype(np.int32))
-            gc.collect()
+
+        if npy_folder and os.path.isdir(npy_folder):
+            # Fast path: load pre-converted .npz files (no h5py/netCDF4)
+            print(f"Preloading {len(self.data)} files from .npz cache: {npy_folder}")
+            skipped = 0
+            for file in tqdm(self.data, desc="preload", unit="file"):
+                stem = os.path.splitext(os.path.basename(file))[0]
+                npz  = os.path.join(npy_folder, stem + '.npz')
+                if not os.path.exists(npz):
+                    skipped += 1
+                    continue
+                arr   = np.load(npz)
+                data  = arr['data'].astype(np.float32)
+                label = arr['label']
+                normalized = (data - mean_arr[:, None, None]) / (std_arr[:, None, None] + 1e-8)
+                frames.append(normalized)
+                labels.append(label.astype(np.int32))
+            if skipped:
+                print(f"Skipped {skipped} files with no .npz (corrupted source files).")
+        else:
+            # Slow path: read directly from .nc files
+            print(f"Preloading {len(self.data)} files from .nc...")
+            for file in tqdm(self.data, desc="preload", unit="file"):
+                ds = xr.load_dataset(file)
+                data = np.stack([ds[ch].values.squeeze() for ch in self.channels], axis=0)
+                label = ds['LABELS'].values.squeeze().copy()
+                ds.close()
+                del ds
+                normalized = (data - mean_arr[:, None, None]) / (std_arr[:, None, None] + 1e-8)
+                frames.append(normalized.astype(np.float32))
+                labels.append(label.astype(np.int32))
+                gc.collect()
+
         self._frames = frames
         self._labels = labels
         print("Preload complete.")

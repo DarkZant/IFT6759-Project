@@ -18,17 +18,26 @@ print(f"Converting {len(files)} files: {SRC} -> {DST}")
 print(f"Channels: {CHANNELS}")
 
 skipped = 0
+errors = []
 for f in tqdm(files, desc='converting', unit='file'):
     stem = os.path.splitext(os.path.basename(f))[0]
     out  = os.path.join(DST, stem + '.npz')
     if os.path.exists(out):
         skipped += 1
         continue
-    ds    = xr.load_dataset(f)
-    data  = np.stack([ds[c].values.squeeze() for c in CHANNELS], axis=0).astype(np.float32)
-    label = ds['LABELS'].values.squeeze().astype(np.int8)
-    ds.close()
-    del ds
-    np.savez_compressed(out, data=data, label=label)
+    try:
+        ds    = xr.load_dataset(f)
+        data  = np.stack([ds[c].values.squeeze() for c in CHANNELS], axis=0).astype(np.float32)
+        label = ds['LABELS'].values.squeeze().astype(np.int8)
+        ds.close()
+        del ds
+        np.savez_compressed(out, data=data, label=label)
+    except Exception as e:
+        errors.append(f)
+        tqdm.write(f"[SKIP] {os.path.basename(f)}: {e}")
 
-print(f"Done. {len(files) - skipped} converted, {skipped} skipped (already exist).")
+print(f"Done. {len(files) - skipped - len(errors)} converted, {skipped} skipped, {len(errors)} errors.")
+if errors:
+    print("Corrupted files:")
+    for f in errors:
+        print(f"  {f}")

@@ -10,6 +10,7 @@ from ConvLSTM.convlstm_cell import ConvLSTM
 # Config — TRAIN_FOLDER can be overridden via env var (set in submit.sh for HPC)
 TRAIN_FOLDER   = os.environ.get("TRAIN_FOLDER", "data/climatenet_engineered/train")
 CHECKPOINT_DIR = os.environ.get("CHECKPOINT_DIR", "checkpoints")
+NPY_FOLDER     = os.environ.get("NPY_FOLDER", None)
 
 # All 20 available channels:
 #   TMQ, U850, V850, UBOT, VBOT, QREFHT, PS, PSL, T200, T500,
@@ -33,8 +34,12 @@ LR          = 1e-3
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-all_files = sorted(glob.glob(TRAIN_FOLDER + "/*.nc"))
+SKIP_FILES = {"data-2000-04-17-01-1_5.nc"}
+
+all_files = [f for f in sorted(glob.glob(TRAIN_FOLDER + "/*.nc"))
+             if os.path.basename(f) not in SKIP_FILES]
 assert len(all_files) > 0, f"No .nc files found in {TRAIN_FOLDER}"
+print(f"Skipping {len(SKIP_FILES)} known-corrupted file(s): {SKIP_FILES}")
 
 split_idx   = int(len(all_files) * (1 - VAL_SPLIT))
 train_files = all_files[:split_idx]
@@ -48,12 +53,12 @@ print(f"Files — train: {len(train_files)}, val: {len(val_files)}")
 train_dataset = ClimateNetDataset(
     data=train_files, folder=TRAIN_FOLDER,
     time_steps=TIME_STEPS, selected_channels=SELECTED_CHANNELS,
-    preload=True
+    preload=True, npy_folder=NPY_FOLDER
 )
 val_dataset = ClimateNetDataset(
     data=val_files, folder=TRAIN_FOLDER,
     time_steps=TIME_STEPS, selected_channels=SELECTED_CHANNELS,
-    train_folder=TRAIN_FOLDER, preload=True
+    train_folder=TRAIN_FOLDER, preload=True, npy_folder=NPY_FOLDER
 )
 
 

@@ -27,7 +27,6 @@ export HDF5_USE_FILE_LOCKING=FALSE
 export PYTHONUNBUFFERED=1
 export PYTHONNOUSERSITE=1
 export TRAIN_FOLDER=/project/def-sponsor00/shared_CN_B/climatenet_engineered/train
-export NPY_FOLDER=$PROJECT_DIR/data/climatenet_npy/train
 
 echo "Starting ConvLSTM training..."
 python ConvLSTM/train.py
