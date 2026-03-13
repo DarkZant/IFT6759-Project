@@ -8,7 +8,7 @@ import json
 import os
 from tqdm import tqdm
 class ClimateNetDataset(Dataset):
-    def __init__(self, data, folder, time_steps=10, selected_channels=None, train_folder=None):
+    def __init__(self, data, folder, time_steps=10, selected_channels=None, train_folder=None, preload=False):
         self.data = data
         stats_folder = train_folder if train_folder is not None else folder
         first_file = sorted(glob.glob(stats_folder + '/*.nc'))[0]
@@ -23,11 +23,38 @@ class ClimateNetDataset(Dataset):
             self.channels = all_channels
         self.time_steps = time_steps
         self.means, self.stds = self.compute_mean_per_variable(stats_folder, cache_stats='data/stats.json')
+        self._frames = None
+        self._labels = None
+        if preload:
+            self._preload()
 
     def __len__(self):
         return len(self.data) - self.time_steps + 1
 
+    def _preload(self):
+        print(f"Preloading {len(self.data)} files into RAM...")
+        mean_arr = np.array([self.means[ch] for ch in self.channels])
+        std_arr  = np.array([self.stds[ch]  for ch in self.channels])
+        frames, labels = [], []
+        for file in tqdm(self.data, desc="preload", unit="file"):
+            ds = xr.load_dataset(file)
+            data = np.stack([ds[ch].values.squeeze() for ch in self.channels], axis=0)
+            label = ds['LABELS'].values.squeeze().copy()
+            ds.close()
+            del ds
+            normalized = (data - mean_arr[:, None, None]) / (std_arr[:, None, None] + 1e-8)
+            frames.append(normalized.astype(np.float32))
+            labels.append(label.astype(np.int32))
+            gc.collect()
+        self._frames = frames
+        self._labels = labels
+        print("Preload complete.")
+
     def __getitem__(self, idx):
+        if self._frames is not None:
+            data  = np.stack(self._frames[idx:idx+self.time_steps])
+            label = self._labels[idx + self.time_steps - 1]
+            return torch.from_numpy(data), torch.from_numpy(label.astype(np.int64))
         files = self.data[idx:idx+self.time_steps]
         stacked_data = []
         stacked_label = []
