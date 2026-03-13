@@ -56,12 +56,11 @@ print(f"Files — train: {len(train_files)}, val: {len(val_files)}")
 train_dataset = ClimateNetDataset(
     data=train_files, folder=TRAIN_FOLDER,
     time_steps=TIME_STEPS, selected_channels=SELECTED_CHANNELS,
-    preload=True, npy_folder=NPY_FOLDER
 )
 val_dataset = ClimateNetDataset(
     data=val_files, folder=TRAIN_FOLDER,
     time_steps=TIME_STEPS, selected_channels=SELECTED_CHANNELS,
-    train_folder=TRAIN_FOLDER, preload=True, npy_folder=NPY_FOLDER
+    train_folder=TRAIN_FOLDER,
 )
 
 
