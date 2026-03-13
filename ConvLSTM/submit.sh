@@ -12,7 +12,11 @@
 echo "Job started on $(hostname) at $(date)"
 echo "Job ID: $SLURM_JOB_ID"
 
-module load StdEnv/2020 gcc/9.3.0 cuda/11.4 python/3.10 hdf5/1.12.1
+module --force purge
+module load python/3.10
+module load cuda
+module load netcdf
+module load hdf5
 
 PROJECT_DIR=/home/remilalonde/Project/IFT6759-Project
 source $PROJECT_DIR/.venv/bin/activate
@@ -27,6 +31,7 @@ export HDF5_USE_FILE_LOCKING=FALSE
 export PYTHONUNBUFFERED=1
 export PYTHONNOUSERSITE=1
 export TRAIN_FOLDER=/project/def-sponsor00/shared_CN_B/climatenet_engineered/train
+export NPY_FOLDER=$PROJECT_DIR/data/climatenet_npy/train
 
 echo "Starting ConvLSTM training..."
 python ConvLSTM/train.py
