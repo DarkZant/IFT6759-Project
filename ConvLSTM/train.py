@@ -36,7 +36,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 SKIP_FILES = {
     "data-2000-04-17-01-1_5.nc",
-    "data-2008-09-20-01-1_0.nc",
+    "data-2008-10-03-01-1_0.nc",
 }
 
 all_files = [f for f in sorted(glob.glob(TRAIN_FOLDER + "/*.nc"))
