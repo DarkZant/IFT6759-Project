@@ -6,7 +6,7 @@ import numpy as np
 import json
 import os
 from tqdm import tqdm
-
+import h5py
 class ClimateNetDataset(Dataset):
     def __init__(self, data, folder, time_steps=10, selected_channels=None, train_folder=None):
         self.data = data
@@ -94,13 +94,13 @@ class ClimateNetDataset(Dataset):
             if 'class_weights' in stats:
                 return {int(k): v for k, v in stats['class_weights'].items()}
 
+        
         class_counts = np.zeros(3, dtype=np.int64)
         for file in self.data:
-            ds = xr.open_dataset(file, engine='h5netcdf')
-            labels = ds['LABELS'].values.flatten().astype(int)
+            with h5py.File(file, 'r') as f:
+                labels = f['LABELS'][...].flatten().astype(np.int64)
             counts = np.bincount(labels, minlength=3)
             class_counts += counts
-            ds.close()
         total_pixels = class_counts.sum()
         class_weight = {i: total_pixels / (3 * count)
                         for i, count in enumerate(class_counts) if count > 0}
