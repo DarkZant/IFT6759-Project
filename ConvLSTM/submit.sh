@@ -7,12 +7,13 @@
 #SBATCH --time=04:00:00
 #SBATCH --output=/home/remilalonde/Project/IFT6759-Project/logs/convlstm_%j.out
 #SBATCH --error=/home/remilalonde/Project/IFT6759-Project/logs/convlstm_%j.err
+#SBATCH --export=NONE
 
 
 echo "Job started on $(hostname) at $(date)"
 echo "Job ID: $SLURM_JOB_ID"
 
-module purge
+module --force purge
 module load StdEnv/2020 gcc/9.3.0 cuda/11.4 python/3.10
 
 PROJECT_DIR=/home/remilalonde/Project/IFT6759-Project
