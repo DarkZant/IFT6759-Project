@@ -5,8 +5,8 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
 #SBATCH --time=04:00:00
-#SBATCH --output=/project/def-sponsor00/remilalonde/logs/convlstm_%j.out
-#SBATCH --error=/project/def-sponsor00/remilalonde/logs/convlstm_%j.err
+#SBATCH --output=/home/remilalonde/Project/IFT6759-Project/logs/convlstm_%j.out
+#SBATCH --error=/home/remilalonde/Project/IFT6759-Project/logs/convlstm_%j.err
 
 
 echo "Job started on $(hostname) at $(date)"
