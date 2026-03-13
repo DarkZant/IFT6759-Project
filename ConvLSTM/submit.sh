@@ -12,7 +12,7 @@
 echo "Job started on $(hostname) at $(date)"
 echo "Job ID: $SLURM_JOB_ID"
 
-module load StdEnv/2020 gcc/9.3.0 cuda/11.4 python/3.10 netcdf
+module load StdEnv/2020 gcc/9.3.0 cuda/11.4 python/3.10
 
 PROJECT_DIR=/home/remilalonde/Project/IFT6759-Project
 source $PROJECT_DIR/.venv/bin/activate
