@@ -19,6 +19,6 @@ source /home/remilalonde/Project/IFT6759-Project/.venv/bin/activate
 
 cd /home/remilalonde/Project/IFT6759-Project/ClimateNet
 
-python example.py --config config_20ch.json --save_preds --output_dir /home/remilalonde/Project/IFT6759-Project/ClimateNet/outputs/cgnet_20ch
+python example.py --config /home/remilalonde/Project/IFT6759-Project/climatenet/config_files/config_20ch.json --save_preds --output_dir /home/remilalonde/Project/IFT6759-Project/ClimateNet/outputs/cgnet_20ch
 
 echo "Job finished"

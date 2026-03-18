@@ -16,9 +16,6 @@ with open(history_path, "r") as f:
 
 print("History loaded successfully.")
 
-# -------------------------
-# Loss Curve
-# -------------------------
 plt.figure()
 plt.plot(history["train_losses"], label="Train Loss")
 plt.plot(history["val_losses"], label="Val Loss")

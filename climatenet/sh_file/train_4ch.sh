@@ -5,8 +5,8 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
 #SBATCH --time=02:00:00
-#SBATCH --output=/home/remilalonde/Project/IFT6759-Project/ClimateNet/logs/cgnet_4ch_%j.out
-#SBATCH --error=/home/remilalonde/Project/IFT6759-Project/ClimateNet/logs/cgnet_4ch_%j.err
+#SBATCH --output=/home/remilalonde/Project/IFT6759-Project/ClimateNet/logs/cgnet_4ch_2_%j.out
+#SBATCH --error=/home/remilalonde/Project/IFT6759-Project/ClimateNet/logs/cgnet_4ch_2_%j.err
 
 echo "Starting CGNet 4-channel job $SLURM_JOB_ID"
 
@@ -19,6 +19,6 @@ source /home/remilalonde/Project/IFT6759-Project/.venv/bin/activate
 
 cd /home/remilalonde/Project/IFT6759-Project/ClimateNet
 
-python example.py --config config_4ch.json --save_preds --output_dir /home/remilalonde/Project/IFT6759-Project/ClimateNet/outputs/cgnet_4ch
+python example.py --config /home/remilalonde/Project/IFT6759-Project/climatenet/config_files/config_4ch.json --save_preds --output_dir /home/remilalonde/Project/IFT6759-Project/ClimateNet/outputs/cgnet_4ch
 
 echo "Job finished"
