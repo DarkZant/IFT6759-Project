@@ -120,11 +120,13 @@ class ConvLSTM(nn.Module):
         return ce_loss + dice
 
     def fit(self, dataloader, optimizer, num_epoch, device):
+        from tqdm import tqdm
         self.train()
         total_loss = 0
         for epoch in range(num_epoch):
             epoch_loss = 0
-            for x, targets in dataloader:
+            pbar = tqdm(dataloader, desc=f"Epoch {epoch+1}/{num_epoch}", unit="batch")
+            for x, targets in pbar:
                 x, targets = x.to(device), targets.to(device)
                 optimizer.zero_grad()
                 pred = self.forward(x)
@@ -133,6 +135,7 @@ class ConvLSTM(nn.Module):
                 optimizer.step()
                 epoch_loss += loss.item()
                 total_loss += loss.item()
+                pbar.set_postfix(loss=f"{loss.item():.4f}")
             print(f"Epoch {epoch+1}/{num_epoch} — loss: {epoch_loss / len(dataloader):.4f}")
         return total_loss / (num_epoch * len(dataloader))
 

@@ -1,0 +1,36 @@
+{
+    "architecture": "cgnet",
+    "seed": 42,
+    "lr": 0.001,
+    "train_batch_size": 1,
+    "pred_batch_size": 1,
+    "epochs": 15,
+    "fields": {
+        "TMQ":    { "mean": 19.21849,      "std": 15.81728   },
+        "U850":   { "mean": 1.55302,       "std": 8.29762    },
+        "V850":   { "mean": 0.25413,       "std": 6.23163    },
+        "UBOT":   { "mean": 0.12488,       "std": 6.65329    },
+        "VBOT":   { "mean": 0.31542,       "std": 5.78419    },
+        "QREFHT": { "mean": 0.007788,      "std": 0.006215   },
+        "PS":     { "mean": 96571.614,     "std": 9700.101   },
+        "PSL":    { "mean": 100814.073,    "std": 1461.226   },
+        "T200":   { "mean": 213.209,       "std": 7.890      },
+        "T500":   { "mean": 253.038,       "std": 12.825     },
+        "PRECT":  { "mean": 2.946e-08,     "std": 1.556e-07  },
+        "TS":     { "mean": 278.711,       "std": 23.683     },
+        "TREFHT": { "mean": 278.421,       "std": 22.512     },
+        "Z1000":  { "mean": 474.173,       "std": 832.808    },
+        "Z200":   { "mean": 11736.105,     "std": 633.258    },
+        "ZBOT":   { "mean": 61.311,        "std": 4.909      },
+        "WS850":  { "mean": 8.701,         "std": 5.870      },
+        "WSBOT":  { "mean": 7.478,         "std": 4.682      },
+        "VRT850": { "mean": 0.002566,      "std": 6.978      },
+        "VRTBOT": { "mean": -0.001308,     "std": 6.201      }
+    },
+    "labels": [
+      "Background",
+      "Tropical Cyclone",
+      "Atmospheric River"
+    ],
+    "description": "The basic CGNet model. You can use this config to train your own model, or load it with our trained weights."
+}
