@@ -21,7 +21,7 @@ cd /home/remilalonde/Project/IFT6759-Project
 
 export TRAIN_FOLDER=/project/def-sponsor00/shared_CN_B/climatenet_engineered/train
 export CHECKPOINT_DIR=/home/remilalonde/Project/IFT6759-Project/checkpoints/hybrid
-export CGNET_WEIGHTS=/home/remilalonde/Project/IFT6759-Project/climatenet/ClimateNet/outputs/cgnet_4ch/trained_cgnet/weights.pth
+export CGNET_WEIGHTS=/home/remilalonde/Project/IFT6759-Project/climatenet/outputs/cgnet_4ch/trained_cgnet/weights.pth
 export TEST_FOLDER=/project/def-sponsor00/shared_CN_B/climatenet_engineered/test
 
 python -m hybrid.train
