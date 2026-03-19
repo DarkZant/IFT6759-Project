@@ -19,6 +19,6 @@ source /home/remilalonde/Project/IFT6759-Project/.venv/bin/activate
 
 cd /home/remilalonde/Project/IFT6759-Project/climatenet
 
-python example.py --config /home/remilalonde/Project/IFT6759-Project/climatenet/config_files/config_uncertainty.json --uncertainty --output_dir /home/remilalonde/Project/IFT6759-Project/climatenet/outputs/cgnet_uncertainty_2
+python example.py --config /home/remilalonde/Project/IFT6759-Project/climatenet/config_files/config_uncertainty.json --uncertainty --output_dir /home/remilalonde/Project/IFT6759-Project/climatenet/outputs/cgnet_uncertainty
 
 echo "Job finished"
