@@ -74,7 +74,7 @@ TIME_STEPS  = 3
 
 VAL_SPLIT  = 0.2
 BATCH_SIZE = 1
-NUM_EPOCHS = 10
+NUM_EPOCHS = 15
 LR         = 1e-3
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -139,6 +139,8 @@ model = CGNetConvLSTM(
     freeze_encoder=FREEZE_ENCODER,
     channels=len(SELECTED_CHANNELS),
 )
+
+print(f"Model Build", flush=True)
 model.to(DEVICE)
 print(f"Model on {DEVICE}")
 print(f"Trainable params: {sum(p.numel() for p in model.parameters() if p.requires_grad):,}")

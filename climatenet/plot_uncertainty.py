@@ -5,7 +5,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from os import path
 
-BASE_OUTPUT_DIR        = 'd:/Universite/Montreal/Project/IFT6759-Project/ClimateNet/outputs/cgnet_4ch'
+BASE_OUTPUT_DIR        = 'd:/Universite/Montreal/Project/IFT6759-Project/climatenet/outputs/cgnet_4ch'
 UNCERTAINTY_OUTPUT_DIR = 'd:/Universite/Montreal/Project/IFT6759-Project/hybrid/outputs/hybrid/hybrid_64'
 TEST_PATH              = 'd:/Universite/Montreal/Project/IFT6759-Project/data/climatenet/test'
 

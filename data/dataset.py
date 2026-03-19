@@ -91,7 +91,7 @@ class ClimateNetDataset(Dataset):
         if self._frames is not None:
             data  = np.stack(self._frames[start:start + self.time_steps])
             label = self._labels[start + self.time_steps - 1]
-            return torch.from_numpy(data), torch.from_numpy(label.astype(np.int64))
+            return torch.tensor(data.copy()), torch.tensor(label.astype(np.int64).copy())
 
         frames, labels = [], []
         for file in self.data[start:start + self.time_steps]:
@@ -107,8 +107,8 @@ class ClimateNetDataset(Dataset):
             gc.collect()
 
         # (T, C, H, W), label from last frame squeezed to (H, W)
-        return (torch.from_numpy(np.stack(frames)),
-                torch.from_numpy(labels[-1].squeeze().astype(np.int64)))
+        return (torch.tensor(np.stack(frames).copy()),
+                torch.tensor(labels[-1].squeeze().astype(np.int64).copy()))
 
     # ── Stats / fields ─────────────────────────────────────────────────────────
 

@@ -1,14 +1,10 @@
 from climatenet.utils.data import ClimateDatasetLabeled, ClimateDataset
 from climatenet.models import CGNet
 from climatenet.utils.utils import Config
-from climatenet.track_events import track_events
-from climatenet.analyze_events import analyze_events
-from climatenet.visualize_events import visualize_events
 import json
 from os import path
 import os
 import argparse
-import matplotlib.pyplot as plt
 import numpy as np
 
 parser = argparse.ArgumentParser()
