@@ -6,6 +6,7 @@ from torch.utils.data import Dataset, DataLoader
 import xarray as xr
 import numpy as np
 from attention_unet import AttentionUNet
+from netCDF4 import Dataset as NetCDFDataset
 
 class ClimateNetDataset(Dataset):
     def __init__(self, data_dir):
@@ -14,7 +15,9 @@ class ClimateNetDataset(Dataset):
         self.corrupted_files = {
             "data-2002-12-27-01-1_4.nc",
             "data-1997-10-12-01-1_0.nc",
-            "data-2001-10-29-01-1_3.nc"
+            "data-2001-10-29-01-1_3.nc",
+            "data-2000-04-17-01-1_5.nc",
+            "data-2008-10-03-01-1_0.nc"
         }
 
         if os.path.exists(data_dir):
@@ -28,16 +31,40 @@ class ClimateNetDataset(Dataset):
 
     def __getitem__(self, idx):
         file_path = os.path.join(self.data_dir, self.valid_files[idx])
+        target_shape = (768, 1152)
+        feature_keys = [
+            'TMQ', 'U850', 'V850', 'UBOT', 'VBOT', 'QREFHT', 'PS', 'PSL',
+            'T200', 'T500', 'PRECT', 'TS', 'TREFHT', 'Z1000', 'Z200', 'ZBOT',
+            'WS850', 'WSBOT', 'VRT850', 'VRTBOT'
+        ]
 
-        with xr.open_dataset(file_path, engine='h5netcdf') as ds:
-            labels = ds['LABELS'].squeeze().values.astype(np.int64)
-            ds_features = ds.drop_vars('LABELS')
-            data = ds_features.to_array().squeeze().values
+        try:
+            with NetCDFDataset(file_path, 'r') as nc:
+                labels = nc.variables['LABELS'][:].squeeze().astype(np.int64)
 
+                processed_features = []
+                for k in feature_keys:
+                    if k in nc.variables:
+                        var_data = nc.variables[k][:].squeeze()
+                        if len(var_data.shape) == 2:
+                            if var_data.shape != target_shape:
+                                var_data = var_data[:target_shape[0], :target_shape[1]]
+                            processed_features.append(var_data)
+
+                while len(processed_features) < 20:
+                    processed_features.append(np.zeros(target_shape))
+
+                data = np.stack(processed_features, axis=0)
+
+        except Exception as e:
+            print(f"\nWARNING: Skipping corrupted file {file_path}. Error: {e}")
+            import random
+            return self.__getitem__(random.randint(0, len(self.valid_files) - 1))
+
+        # Standardize
         data = (data - data.mean(axis=(1, 2), keepdims=True)) / (data.std(axis=(1, 2), keepdims=True) + 1e-7)
 
         return torch.from_numpy(data).float(), torch.from_numpy(labels)
-
 
 def evaluate(model, loader, device, num_classes=3):
     """Evaluates the model over the entire dataloader and computes the metrics."""
@@ -83,8 +110,8 @@ def train():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    train_dir = os.path.abspath(os.path.join(current_dir, "../shared_CN_B/climatenet/train"))
-    test_dir = os.path.abspath(os.path.join(current_dir, "../shared_CN_B/climatenet/test"))
+    train_dir = os.path.abspath(os.path.join(current_dir, "../shared_CN_B/climatenet_engineered/train"))
+    test_dir = os.path.abspath(os.path.join(current_dir, "../shared_CN_B/climatenet_engineered/test"))
 
     # Create Datasets and DataLoaders
     train_dataset = ClimateNetDataset(train_dir)
@@ -93,7 +120,7 @@ def train():
     train_loader = DataLoader(train_dataset, batch_size=2, shuffle=True, num_workers=0)
     test_loader = DataLoader(test_dataset, batch_size=2, shuffle=False, num_workers=0)
 
-    model = AttentionUNet(in_channels=16, out_channels=3).to(device)
+    model = AttentionUNet(in_channels=20, out_channels=3).to(device)
 
     weights = torch.tensor([0.5, 5.0, 2.0]).to(device) # [0.1, 10.0, 3.0]
     criterion = nn.CrossEntropyLoss(weight=weights)
