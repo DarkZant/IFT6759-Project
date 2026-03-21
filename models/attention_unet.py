@@ -76,7 +76,6 @@ class AttentionUNet(nn.Module):
         self.Conv2 = ConvBlock(features[0], features[1])
         self.Conv3 = ConvBlock(features[1], features[2])
         self.Conv4 = ConvBlock(features[2], features[3])
-        self.dropout = nn.Dropout2d(p=0.3)
 
         # Bottleneck
         self.Up5 = nn.ConvTranspose2d(features[3], features[2], kernel_size=2, stride=2)
@@ -105,7 +104,6 @@ class AttentionUNet(nn.Module):
 
         e4 = self.Maxpool(e3)
         e4 = self.Conv4(e4)
-        e4 = self.dropout(e4)
 
         # Decoder with Attention Gates
         d5 = self.Up5(e4)
