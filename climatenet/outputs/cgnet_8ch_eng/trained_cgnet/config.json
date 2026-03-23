@@ -44,5 +44,5 @@
         "Tropical Cyclone",
         "Atmospheric River"
     ],
-    "description": "The basic CGNet model. You can use this config to train your own model, or load it with our trained weights."
+    "description": "CGNet with 4 original channels + 4 engineered channels from Lacombe 2023 (WS850, WSBOT, VRT850, VRTBOT)."
 }
