@@ -100,6 +100,18 @@ class CGNet():
         train_mean_ious = []
         val_mean_ious = []
 
+        train_ious_per_class_history = []
+        val_ious_per_class_history = []
+
+        train_precisions_history = []
+        val_precisions_history = []
+
+        train_recalls_history = []
+        val_recalls_history = []
+
+        train_specificities_history = []
+        val_specificities_history = []
+
         for epoch in range(1, self.config.epochs + 1):
 
             print(f"\n===== Epoch {epoch} =====")
@@ -157,11 +169,28 @@ class CGNet():
             train_ious = get_iou_perClass(train_cm)
             train_mean_iou = train_ious.mean()
             train_mean_ious.append(train_mean_iou)
+            train_ious_per_class_history.append(train_ious.tolist())
+
+            total = train_cm.sum()
+            train_prec, train_rec, train_spec = [], [], []
+            for k in range(3):
+                TP = train_cm[k, k]
+                FP = train_cm[:, k].sum() - TP
+                FN = train_cm[k, :].sum() - TP
+                TN = total - (TP + FP + FN)
+                train_prec.append(float(TP / (TP + FP + 1e-8)))
+                train_rec.append(float(TP / (TP + FN + 1e-8)))
+                train_spec.append(float(TN / (TN + FP + 1e-8)))
+            train_precisions_history.append(train_prec)
+            train_recalls_history.append(train_rec)
+            train_specificities_history.append(train_spec)
 
             print(f"Train Loss: {epoch_loss:.4f}")
             print(f"Train Accuracy: {train_accuracy:.4f}")
             print(f"Train Mean IoU: {train_mean_iou:.4f}")
             print(f"Train IoU per class: {train_ious}")
+            print(f"Train Recall (BG/TC/AR): {train_rec}")
+            print(f"Train Precision (BG/TC/AR): {train_prec}")
 
             ################################
             # VALIDATION
@@ -207,11 +236,29 @@ class CGNet():
             val_ious = get_iou_perClass(val_cm)
             val_mean_iou = val_ious.mean()
             val_mean_ious.append(val_mean_iou)
+            val_ious_per_class_history.append(val_ious.tolist())
+
+            total = val_cm.sum()
+            val_prec, val_rec, val_spec = [], [], []
+            for k in range(3):
+                TP = val_cm[k, k]
+                FP = val_cm[:, k].sum() - TP
+                FN = val_cm[k, :].sum() - TP
+                TN = total - (TP + FP + FN)
+                val_prec.append(float(TP / (TP + FP + 1e-8)))
+                val_rec.append(float(TP / (TP + FN + 1e-8)))
+                val_spec.append(float(TN / (TN + FP + 1e-8)))
+            val_precisions_history.append(val_prec)
+            val_recalls_history.append(val_rec)
+            val_specificities_history.append(val_spec)
 
             print(f"Val Loss: {val_loss:.4f}")
             print(f"Val Accuracy: {val_accuracy:.4f}")
             print(f"Val Mean IoU: {val_mean_iou:.4f}")
             print(f"Val IoU per class: {val_ious}")
+            print(f"Val Recall (BG/TC/AR): {val_rec}")
+            print(f"Val Precision (BG/TC/AR): {val_prec}")
+            print(f"Val Specificity (BG/TC/AR): {val_spec}")
 
         ################################
         # Return history for plotting
@@ -223,8 +270,14 @@ class CGNet():
             "val_accuracies": val_accuracies,
             "train_mean_ious": train_mean_ious,
             "val_mean_ious": val_mean_ious,
-            "train_ious_per_class": train_ious.tolist(),
-            "val_ious_per_class": val_ious.tolist()
+            "train_ious_per_class": train_ious_per_class_history,
+            "val_ious_per_class": val_ious_per_class_history,
+            "train_precisions": train_precisions_history,
+            "val_precisions": val_precisions_history,
+            "train_recalls": train_recalls_history,
+            "val_recalls": val_recalls_history,
+            "train_specificities": train_specificities_history,
+            "val_specificities": val_specificities_history,
         }
 
     def predict(self, dataset: ClimateDataset, save_dir: str = None):
