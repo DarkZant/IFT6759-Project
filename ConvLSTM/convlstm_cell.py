@@ -2,28 +2,30 @@ import torch
 import torch.nn as nn
 
 class ConvLSTMCell(nn.Module):
+    """ ConvLSTM cell implementation """
     def __init__(self, input_dim, hidden_dim, kernel_size, biais):
         super(ConvLSTMCell, self).__init__()
-        self.padding = kernel_size // 2
-        self.conv = nn.Conv2d(in_channels=input_dim + hidden_dim, out_channels=4 * hidden_dim, 
+        self.padding = kernel_size // 2  # conserve H x W
+
+        self.conv = nn.Conv2d(in_channels=input_dim + hidden_dim, out_channels=4 * hidden_dim,
                   kernel_size=kernel_size, padding=self.padding, bias=biais)
-        
+
     def forward(self, x, h_prev, c_prev):
-        combined = torch.cat([x, h_prev], dim=1)
+        combined = torch.cat([x, h_prev], dim=1)  # concat sur la dim canaux
         i, f, o, g = torch.chunk(self.conv(combined), 4, dim=1)
-        i = torch.sigmoid(i)
-        f = torch.sigmoid(f)
-        o = torch.sigmoid(o)
-        g = torch.tanh(g)
+        i = torch.sigmoid(i)   # input gate
+        f = torch.sigmoid(f)   # forget gate
+        o = torch.sigmoid(o)   # output gate
+        g = torch.tanh(g)      # cell candidate
         c_next = f*c_prev + i*g
         h_next = o*torch.tanh(c_next)
         return h_next, c_next
-    
+
     def init_hidden(self, batch_size, hidden_dim, height, width):
         h = torch.zeros(batch_size, hidden_dim, height, width, device=self.conv.weight.device)
         c = torch.zeros(batch_size, hidden_dim, height, width, device=self.conv.weight.device)
         return h, c
-    
+
 
 class ConvLSTMLayer(nn.Module):
     def __init__(self, input_dim, hidden_dim, kernel_size, num_layers, return_all_layer=False):
@@ -44,8 +46,8 @@ class ConvLSTMLayer(nn.Module):
                 h, c = layer(x[:, t], h, c)
                 outputs.append(h)
             x = torch.stack(outputs, dim=1)
-        return x if self.return_all_layer else x[:, -1]
-    
+        return x if self.return_all_layer else x[:, -1]  # dernier pas de temps seulement
+
 class SegmentationHead(nn.Module):
     def __init__(self, hidden_dim, num_classes):
         super(SegmentationHead, self).__init__()
@@ -53,8 +55,8 @@ class SegmentationHead(nn.Module):
 
     def forward(self, x):
         out = self.conv(x)
-        return out
-    
+        return out 
+
 
 class ConvLSTM(nn.Module):
     def __init__(self, input_dim, hidden_dim, kernel_size, num_layers, num_classes=3, class_weights=None):
@@ -71,9 +73,9 @@ class ConvLSTM(nn.Module):
         x = self.convlstm(x)
         out = self.segmentation_head(x)
         return out
-    
+
     def iou_per_class(self, pred, targets):
-        pred_labels = torch.argmax(pred, dim=1)
+        pred_labels = torch.argmax(pred, dim=1)  # logits vers labels
         ious = []
         for cls in range(self.num_classes):
             pred_cls = (pred_labels == cls)
@@ -96,7 +98,7 @@ class ConvLSTM(nn.Module):
             target_cls  = (targets == cls)
             tp          = (pred_cls & target_cls).sum().item()
             actual      = target_cls.sum().item()
-            recalls.append(tp / actual if actual > 0 else 0.0)
+            recalls.append(tp / actual if actual > 0 else 0.0) # TP / actual positives
         return recalls
 
     def mean_recall(self, pred, targets):
@@ -117,7 +119,7 @@ class ConvLSTM(nn.Module):
     def combined_loss(self, pred, targets):
         ce_loss = nn.CrossEntropyLoss(weight=self.class_weights)(pred, targets)
         dice = self.dice_loss(pred, targets)
-        return ce_loss + dice
+        return ce_loss + dice  # CE pixel par pixel + Dice overlap global
 
     def fit(self, dataloader, optimizer, num_epoch, device):
         from tqdm import tqdm
@@ -159,11 +161,10 @@ class ConvLSTM(nn.Module):
         per_class_iou    = [sum(cls) / len(cls) for cls in zip(*all_per_class_iou)]
         per_class_recall = [sum(cls) / len(cls) for cls in zip(*all_per_class_recall)]
         return mean_iou, per_class_iou, mean_recall, per_class_recall
-    
+
     def predict(self, x):
         self.eval()
         with torch.no_grad():
             pred = self.forward(x)
             pred_labels = torch.argmax(pred, dim=1)
-        return pred_labels
-        
+        return pred_labels  # (B, H, W) carte de segmentation

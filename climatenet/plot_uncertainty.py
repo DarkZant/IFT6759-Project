@@ -4,34 +4,35 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from os import path
+import glob, os
 
 BASE_OUTPUT_DIR        = 'd:/Universite/Montreal/Project/IFT6759-Project/climatenet/outputs/cgnet_4ch'
-UNCERTAINTY_OUTPUT_DIR = 'd:/Universite/Montreal/Project/IFT6759-Project/hybrid/outputs/hybrid/hybrid_64'
+UNCERTAINTY_OUTPUT_DIR = 'd:/Universite/Montreal/Project/IFT6759-Project/climatenet/outputs/cgnet_uncertainty'
 TEST_PATH              = 'd:/Universite/Montreal/Project/IFT6759-Project/data/climatenet/test'
 
 # Timestep to visualize
 T = 6
 
-# ── Load data ────────────────────────────────────────────────────────────────
+# Load data 
 base_preds  = xr.open_dataarray(path.join(BASE_OUTPUT_DIR,        'predictions.nc'))
 unc_preds   = xr.open_dataarray(path.join(UNCERTAINTY_OUTPUT_DIR, 'predictions.nc'))
-uncertainty = xr.open_dataarray(path.join(UNCERTAINTY_OUTPUT_DIR, 'predictions.nc'))
+uncertainty = xr.open_dataarray(path.join(UNCERTAINTY_OUTPUT_DIR, 'uncertainty.nc'))
 
 # Load ground truth from the test .nc file matching timestep T
-import glob, os
+
 test_files = sorted(glob.glob(TEST_PATH + '/*.nc'))
 gt_ds      = xr.load_dataset(test_files[T])
-gt_frame   = gt_ds['LABELS'].values.squeeze()
+gt_frame   = gt_ds['LABELS'].values.squeeze() # Get real labels for this timestep
 
 base_frame = base_preds.isel(time=T).values
-unc_frame  = unc_preds.isel(time=T).values
+unc_frame  = unc_preds.isel(time=T).values # Get prediction for this Time step
 unc_var    = uncertainty.isel(time=T).values
 
-# ── Error maps ───────────────────────────────────────────────────────────────
+# Error maps 
 base_errors = (base_frame != gt_frame).astype(float)
 unc_errors  = (unc_frame  != gt_frame).astype(float)
 
-# ── Plot ─────────────────────────────────────────────────────────────────────
+# Plot
 cmap_seg = matplotlib.colors.ListedColormap(['white', 'red', 'blue'])
 
 fig, axes = plt.subplots(2, 3, figsize=(18, 10))

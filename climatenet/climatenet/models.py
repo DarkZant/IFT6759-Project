@@ -54,7 +54,7 @@ class CGNet():
             self.config = config
             self.network = CGNetModule(
                 classes=len(self.config.labels),
-                channels=len(list(self.config.fields)),
+                channels=len(list(self.config.fields)), # Pass the channels to the model dynamically based on the config
                 dropout_flag=self.config.dropout_flag).cuda()
         elif model_path is not None:
             # Load model
@@ -313,11 +313,6 @@ class CGNet():
         '''
         MC Dropout inference: run n_passes forward passes with dropout active,
         return mean prediction and per-pixel uncertainty (variance).
-
-        Returns
-        -------
-        mean_preds : xr.DataArray  — argmax of mean softmax, shape (time, lat, lon)
-        uncertainty : xr.DataArray — mean variance across classes, shape (time, lat, lon)
         '''
         self.network.train()  # keep dropout active
         collate = ClimateDataset.collate
@@ -332,19 +327,19 @@ class CGNet():
                 features = features.squeeze(1)
             features = features.cuda()
 
-            # Collect n_passes softmax outputs: list of (B, C, H, W)
+            # Collect n_passes softmax outputs
             passes = []
             with torch.no_grad():
                 for _ in range(n_passes):
                     out = torch.softmax(self.network(features), dim=1)
                     passes.append(out.cpu().numpy())
 
-            # passes: (n_passes, B, C, H, W)
+            # passes
             passes = np.stack(passes, axis=0)
-            mean_probs = passes.mean(axis=0)          # (B, C, H, W)
-            variance = passes.var(axis=0).mean(axis=1) # (B, H, W) — avg var across classes
+            mean_probs = passes.mean(axis=0)
+            variance = passes.var(axis=0).mean(axis=1)
 
-            preds = mean_probs.argmax(axis=1)          # (B, H, W)
+            preds = mean_probs.argmax(axis=1)
 
             coords = batch.coords
             del coords['variable']

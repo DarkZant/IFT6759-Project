@@ -8,17 +8,12 @@ from torch.utils.data import DataLoader
 from data.dataset import ClimateNetDataset
 from ConvLSTM.convlstm_cell import ConvLSTM
 
-# Config — TRAIN_FOLDER can be overridden via env var (set in submit.sh for HPC)
 TRAIN_FOLDER   = os.environ.get("TRAIN_FOLDER", "data/climatenet_engineered/train")
 CHECKPOINT_DIR = os.environ.get("CHECKPOINT_DIR", "checkpoints")
-NPY_FOLDER     = os.environ.get("NPY_FOLDER", None)
 
-# All 20 available channels:
 #   TMQ, U850, V850, UBOT, VBOT, QREFHT, PS, PSL, T200, T500,
 #   PRECT, TS, TREFHT, Z1000, Z200, ZBOT, WS850, WSBOT, VRT850, VRTBOT
 
-# Set to None to use all 20, or list any subset:
-# Using 4 channels (same as CGNet baseline) to fit in 4.75 GB MIG GPU
 SELECTED_CHANNELS = ['TMQ', 'U850', 'V850', 'PSL']
 
 HIDDEN_DIM  = 16
@@ -42,9 +37,8 @@ SKIP_FILES = {
 
 all_files = [f for f in sorted(glob.glob(TRAIN_FOLDER + "/*.nc"))
              if os.path.basename(f) not in SKIP_FILES]
-assert len(all_files) > 0, f"No .nc files found in {TRAIN_FOLDER}"
-print(f"Skipping {len(SKIP_FILES)} known-corrupted file(s): {SKIP_FILES}")
 
+# Not shuffled to keep time coherence
 split_idx   = int(len(all_files) * (1 - VAL_SPLIT))
 train_files = all_files[:split_idx]
 val_files   = all_files[split_idx:]
@@ -61,22 +55,19 @@ train_dataset = ClimateNetDataset(
 val_dataset = ClimateNetDataset(
     data=val_files, folder=TRAIN_FOLDER,
     time_steps=TIME_STEPS, selected_channels=SELECTED_CHANNELS,
-    train_folder=TRAIN_FOLDER,
 )
 
 
 INPUT_DIM = len(train_dataset.channels)
-print(f"Using {INPUT_DIM} channels: {train_dataset.channels}")
+print(f"Using {INPUT_DIM} channels")
 
-NUM_WORKERS  = 0  # h5netcdf is not fork-safe; multiprocessing workers crash
-train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=NUM_WORKERS)
-val_loader   = DataLoader(val_dataset,   batch_size=BATCH_SIZE, shuffle=False, num_workers=NUM_WORKERS)
+train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=False)
+val_loader   = DataLoader(val_dataset,   batch_size=BATCH_SIZE, shuffle=False)
 
 print(f"Train batches: {len(train_loader)}, Val batches: {len(val_loader)}")
 
-# Class weights — from ClimateNet dataset (BG 93.865%, TC 0.462%, AR 5.674%)
+# Class weights (BG 93.865%, TC 0.462%, AR 5.674%)
 class_weights = torch.tensor([0.355, 72.171, 5.875], dtype=torch.float32)
-print(f"Class weights — BG: {class_weights[0]:.3f}, TC: {class_weights[1]:.3f}, AR: {class_weights[2]:.3f}")
 
 
 # Model and optimizer
@@ -91,12 +82,11 @@ model = ConvLSTM(
 )
 model.to(DEVICE)
 print(f"Model on {DEVICE}")
-print(f"Trainable params: {sum(p.numel() for p in model.parameters() if p.requires_grad):,}")
 
 optimizer = torch.optim.Adam(model.parameters(), lr=LR)
 
 
-# Train — one epoch at a time to record history
+# Train
 
 os.makedirs(CHECKPOINT_DIR, exist_ok=True)
 
@@ -112,7 +102,7 @@ history = {
     "val_recall_ar":    [],
 }
 
-print(f"\nStarting training for {NUM_EPOCHS} epochs...")
+print(f"\nStarting training for {NUM_EPOCHS} epochs")
 for epoch in range(1, NUM_EPOCHS + 1):
     train_loss = model.fit(train_loader, optimizer, num_epoch=1, device=DEVICE)
     mean_iou, per_class_iou, mean_recall, per_class_recall = model.evaluate(val_loader, device=DEVICE)
@@ -160,16 +150,16 @@ torch.save({
 print(f"Checkpoint saved to {checkpoint_path}")
 
 
-# Save one val sample for local visualization
+# # Save one val sample for local visualization
 
-model.eval()
-sample_x, sample_y = val_dataset[0]          # (T, C, H, W), (H, W)
-x_in = sample_x.unsqueeze(0).to(DEVICE)      # (1, T, C, H, W)
+# model.eval()
+# sample_x, sample_y = val_dataset[0]          # (T, C, H, W), (H, W)
+# x_in = sample_x.unsqueeze(0).to(DEVICE)      # (1, T, C, H, W)
 
-with torch.no_grad():
-    pred_mask = model.predict(x_in)[0].cpu().numpy()   # (H, W)
+# with torch.no_grad():
+#     pred_mask = model.predict(x_in)[0].cpu().numpy()   # (H, W)
 
-np.save(os.path.join(CHECKPOINT_DIR, "sample_input.npy"),  sample_x[0, 0].numpy())
-np.save(os.path.join(CHECKPOINT_DIR, "sample_pred.npy"),   pred_mask)
-np.save(os.path.join(CHECKPOINT_DIR, "sample_gt.npy"),     sample_y.numpy())
-print(f"Sample arrays saved to {CHECKPOINT_DIR} (input/pred/gt .npy)")
+# np.save(os.path.join(CHECKPOINT_DIR, "sample_input.npy"),  sample_x[0, 0].numpy())
+# np.save(os.path.join(CHECKPOINT_DIR, "sample_pred.npy"),   pred_mask)
+# np.save(os.path.join(CHECKPOINT_DIR, "sample_gt.npy"),     sample_y.numpy())
+# print(f"Sample arrays saved to {CHECKPOINT_DIR} (input/pred/gt .npy)")

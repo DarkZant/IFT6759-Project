@@ -49,30 +49,6 @@ class CGNetEncoder(CGNetModule):
 
 
 class CGNetConvLSTM(ConvLSTM):
-    """
-    Hybrid model: CGNet spatial encoder + ConvLSTM temporal reasoning.
-
-    For each frame in the input sequence, the CGNet encoder extracts
-    rich spatial features (256 channels, 1/8 resolution). The ConvLSTM
-    layer then processes the sequence of feature maps to capture how
-    atmospheric patterns evolve over time. A 1x1 classifier head and
-    bilinear upsample produce the final per-pixel class map.
-
-    Inherits fit(), evaluate(), predict(), combined_loss() from ConvLSTM
-    — no changes needed there since they all work through self.forward().
-
-    Args:
-        hidden_dim        : ConvLSTM hidden channels
-        kernel_size       : ConvLSTM kernel size
-        num_layers        : number of stacked ConvLSTM layers
-        num_classes       : 3 (BG / TC / AR)
-        class_weights     : optional tensor for weighted CrossEntropy
-        cgnet_weights_path: path to pretrained CGNet .pth weights file.
-                            If None, CGNet encoder is randomly initialized.
-        freeze_encoder    : if True, CGNet weights are frozen during training.
-                            Set False to fine-tune end-to-end.
-        channels          : number of input climate variable channels (default 4)
-    """
 
     def __init__(
         self,
@@ -85,11 +61,10 @@ class CGNetConvLSTM(ConvLSTM):
         freeze_encoder=True,
         channels=4,
     ):
-        # Bypass ConvLSTM.__init__ — we set everything manually below
         nn.Module.__init__(self)
         self.num_classes = num_classes
 
-        # --- Spatial encoder: CGNet without its classifier ---
+        # Spatial encoder (CGnet)
         self.encoder = CGNetEncoder(classes=num_classes, channels=channels)
         if cgnet_weights_path is not None:
             state = torch.load(cgnet_weights_path, map_location='cpu')
@@ -98,10 +73,8 @@ class CGNetConvLSTM(ConvLSTM):
         if freeze_encoder:
             for param in self.encoder.parameters():
                 param.requires_grad = False
-            print("CGNet encoder frozen — only ConvLSTM + head will be trained.")
+            print("CGNet encoder frozen.")
 
-        # --- Temporal reasoning: ConvLSTM on top of CGNet features ---
-        # CGNet encoder always outputs 256 channels regardless of input channels
         self.convlstm = ConvLSTMLayer(
             input_dim=256,
             hidden_dim=hidden_dim,
@@ -109,37 +82,31 @@ class CGNetConvLSTM(ConvLSTM):
             num_layers=num_layers,
         )
 
-        # --- Classifier head (inherited name used by parent methods) ---
+        # Classifier head
         self.segmentation_head = SegmentationHead(hidden_dim, num_classes)
 
-        # --- Class weights (used by inherited combined_loss) ---
+        # Class weights
         if class_weights is not None:
             self.register_buffer('class_weights', class_weights)
         else:
             self.register_buffer('class_weights', None)
 
     def forward(self, x):
-        """
-        Args:
-            x: (B, T, C, H, W)  — batch of T-frame sequences
 
-        Returns:
-            logits: (B, num_classes, H, W)
-        """
         B, T, C, H, W = x.shape
 
-        # 1. Extract spatial features for every frame (shared encoder weights)
+        # 1. Extract spatial features
         features = []
         for t in range(T):
-            feat = self.encoder.encode(x[:, t])   # (B, 256, H/8, W/8)
+            feat = self.encoder.encode(x[:, t]) 
             features.append(feat)
-        features = torch.stack(features, dim=1)    # (B, T, 256, H/8, W/8)
+        features = torch.stack(features, dim=1)
 
-        # 2. Temporal reasoning — returns last hidden state by default
-        last_hidden = self.convlstm(features)      # (B, hidden_dim, H/8, W/8)
+        # 2. Temporal 
+        last_hidden = self.convlstm(features)
 
         # 3. Classify
-        logits = self.segmentation_head(last_hidden)  # (B, num_classes, H/8, W/8)
+        logits = self.segmentation_head(last_hidden)
 
         # 4. Upsample back to original spatial resolution
         out = F.interpolate(logits, size=(H, W), mode='bilinear', align_corners=False)
