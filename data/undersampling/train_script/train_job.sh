@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=climatenet_top50
+#SBATCH --job-name=climatenet_top64
 #SBATCH --account=def-sponsor00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
@@ -10,36 +10,28 @@
 #SBATCH --output=logs/slurm-%j.out
 #SBATCH --error=logs/slurm-%j.err
 
-# ── Infos ─────────────────────────────────────────────────────────────────────
 echo "========================================"
 echo "Job ID     : $SLURM_JOB_ID"
 echo "Nœud       : $SLURMD_NODENAME"
 echo "Date début : $(date)"
-echo "Sélection  : top 64% (199 fichiers)"
+echo "Sélection  : top 64% (298 fichiers)"
 echo "========================================"
 
-# ── Chemins ───────────────────────────────────────────────────────────────────
 REPO_DIR=$HOME/ClimateNet
 DATA_SRC=/home/laurentfaucher/projects/def-sponsor00/shared_CN_B/climatenet_engineered
 SELECTED_CSV=$REPO_DIR/selected_files_top64pct.csv
 
-# ── Vérification du CSV ───────────────────────────────────────────────────────
-if [ ! -f "$SELECTED_CSV" ]; then
-    echo "❌ ERREUR : CSV introuvable à $SELECTED_CSV"
-    exit 1
-fi
-
 N_SELECTED=$(tail -n +2 "$SELECTED_CSV" | wc -l)
 echo "Fichiers sélectionnés dans le CSV : $N_SELECTED"
 
-# ── Copie test complet ────────────────────────────────────────────────────────
+# Copie de test
 echo "[$(date)] Copie du test set..."
 mkdir -p $SLURM_TMPDIR/climatenet/test
 cp $DATA_SRC/test/*.nc $SLURM_TMPDIR/climatenet/test/
 echo "[$(date)] Test set : $(ls $SLURM_TMPDIR/climatenet/test | wc -l) fichiers"
 
-# ── Copie sélective du train (top 50% par score pondéré) ─────────────────────
-echo "[$(date)] Copie sélective du train (top 50%)..."
+# Copie de train
+echo "[$(date)] Copie sélective du train (top 65%)..."
 mkdir -p $SLURM_TMPDIR/climatenet/train
 
 tail -n +2 "$SELECTED_CSV" | cut -d',' -f1 | while read filename; do
@@ -47,13 +39,13 @@ tail -n +2 "$SELECTED_CSV" | cut -d',' -f1 | while read filename; do
     if [ -f "$src" ]; then
         cp "$src" $SLURM_TMPDIR/climatenet/train/
     else
-        echo "  ⚠️  Fichier introuvable : $filename"
+        echo "Fichier introuvable : $filename"
     fi
 done
 
 echo "[$(date)] Train copié : $(ls $SLURM_TMPDIR/climatenet/train | wc -l) fichiers"
 
-# ── Suppression des fichiers corrompus ────────────────────────────────────────
+# Fichiers corompus
 echo "[$(date)] Suppression des fichiers corrompus..."
 rm -f $SLURM_TMPDIR/climatenet/train/data-2002-12-27-01-1_4.nc
 rm -f $SLURM_TMPDIR/climatenet/train/data-1997-10-12-01-1_0.nc
@@ -61,7 +53,7 @@ rm -f $SLURM_TMPDIR/climatenet/train/data-2001-10-29-01-1_3.nc
 rm -f $SLURM_TMPDIR/climatenet/train/data-2000-04-17-01-1_5.nc
 echo "[$(date)] Train après nettoyage : $(ls $SLURM_TMPDIR/climatenet/train | wc -l) fichiers"
 
-# ── Val split (2008-2010) ─────────────────────────────────────────────────────
+# Ensemble de validation
 echo "[$(date)] Création du val set (années 2008-2010)..."
 mkdir -p $SLURM_TMPDIR/climatenet/val
 
@@ -77,7 +69,7 @@ rm -f $SLURM_TMPDIR/climatenet/val/data-2008-10-03-01-1_0.nc
 echo "Val set   : $(ls $SLURM_TMPDIR/climatenet/val   | wc -l) fichiers"
 echo "Train set : $(ls $SLURM_TMPDIR/climatenet/train | wc -l) fichiers"
 
-# ── Virtualenv ────────────────────────────────────────────────────────────────
+# Environement virtuel
 echo "[$(date)] Création du virtualenv..."
 module --force purge
 export PATH=/cvmfs/soft.computecanada.ca/easybuild/software/2023/x86-64-v3/Compiler/gcccore/python/3.11.5/bin:$PATH
@@ -108,8 +100,8 @@ python -c "import xarray; print('xarray:', xarray.__version__)"
 python -c "from climatenet.models import CGNet; print('climatenet: OK')"
 echo "========================================"
 
-# ── Dossier de sortie ─────────────────────────────────────────────────────────
-OUTPUT_DIR=$HOME/ClimateNet/results/top50_run_$SLURM_JOB_ID
+# Dossier de sortie 
+OUTPUT_DIR=$HOME/ClimateNet/results/top75_run_$SLURM_JOB_ID
 mkdir -p $OUTPUT_DIR
 
 echo "top50pct | alpha=12 beta=1 | $(date) | job=$SLURM_JOB_ID" > $OUTPUT_DIR/run_info.txt
@@ -117,7 +109,7 @@ echo "Train : $(ls $SLURM_TMPDIR/climatenet/train | wc -l) fichiers" >> $OUTPUT_
 echo "Val   : $(ls $SLURM_TMPDIR/climatenet/val   | wc -l) fichiers" >> $OUTPUT_DIR/run_info.txt
 echo "Test  : $(ls $SLURM_TMPDIR/climatenet/test  | wc -l) fichiers" >> $OUTPUT_DIR/run_info.txt
 
-# ── Entraînement ──────────────────────────────────────────────────────────────
+# Entraînement 
 export PYTORCH_ALLOC_CONF=expandable_segments:True
 echo "[$(date)] Démarrage entraînement — top 50% fichiers"
 echo "========================================"
