@@ -61,7 +61,7 @@ total_bg_dropped = 0
 for f in tqdm(files, desc='Extraction patches'):
     ds = xr.open_dataset(f)
 
-    # features : (4, 768, 1152) 
+    # features : (variables, 768, 1152) 
     X = np.stack([ds[v].values[0] for v in VARIABLES], axis=0).astype(np.float32)
 
     # labels : (768, 1152)

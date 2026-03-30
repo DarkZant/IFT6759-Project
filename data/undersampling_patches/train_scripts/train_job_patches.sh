@@ -91,9 +91,6 @@ python $REPO_DIR/preprocess_patches.py \
 
 echo "[$(date)] Patches train : $(ls $PATCH_DIR/train | wc -l)"
 
-echo "[$(date)] Calcul des class weights..."
-python $REPO_DIR/calc_weights.py --patch_dir $PATCH_DIR/train
-
 python $REPO_DIR/preprocess_patches.py \
     --data_dir  $DATA_DIR/val \
     --out_dir   $PATCH_DIR/val \
@@ -115,17 +112,6 @@ echo "[$(date)] Patches test : $(ls $PATCH_DIR/test | wc -l)"
 
 OUTPUT_DIR=$HOME/ClimateNet/results/patches_run_$SLURM_JOB_ID
 mkdir -p $OUTPUT_DIR
-
-echo "patches 128x128 BG=20% | $(date) | job=$SLURM_JOB_ID" > $OUTPUT_DIR/run_info.txt
-echo "Train patches : $(ls $PATCH_DIR/train | wc -l)" >> $OUTPUT_DIR/run_info.txt
-echo "Val patches   : $(ls $PATCH_DIR/val   | wc -l)" >> $OUTPUT_DIR/run_info.txt
-echo "Test patches  : $(ls $PATCH_DIR/test  | wc -l)" >> $OUTPUT_DIR/run_info.txt
-echo "Train size    : $(du -sh $DATA_DIR/train | cut -f1)"      >> $OUTPUT_DIR/run_info.txt
-echo "Val size      : $(du -sh $DATA_DIR/val   | cut -f1)"      >> $OUTPUT_DIR/run_info.txt
-echo "Test size     : $(du -sh $DATA_DIR/test  | cut -f1)"      >> $OUTPUT_DIR/run_info.txt
-echo "Train size now: $(du -sh $PATCH_DIR/train | cut -f1)"     >> $OUTPUT_DIR/run_info.txt
-echo "Val size now  : $(du -sh $PATCH_DIR/val   | cut -f1)"     >> $OUTPUT_DIR/run_info.txt
-
 
 # Entraînement
 export PYTORCH_ALLOC_CONF=expandable_segments:True
