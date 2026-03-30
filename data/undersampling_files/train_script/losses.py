@@ -8,10 +8,10 @@ import os
 _MASK_PATH = os.path.join(os.path.dirname(__file__), '../../safe_mask.npy')
 if os.path.exists(_MASK_PATH):
     _safe_mask = torch.from_numpy(np.load(_MASK_PATH)).bool()  # shape (768, 1152)
-    print(f'[losses.py] Masque géographique chargé — {_safe_mask.sum().item():,} pixels ignorés ({100*_safe_mask.float().mean().item():.1f}%)')
+    print(f'[losses.py] Masque géographique chargé: {_safe_mask.sum().item():,} pixels ignorés ({100*_safe_mask.float().mean().item():.1f}%)')
 else:
     _safe_mask = None
-    print('[losses.py] safe_mask.npy non trouvé — aucun masque appliqué')
+    print('[losses.py] safe_mask.npy non trouvé: aucun masque appliqué')
 
 
 def jaccard_loss(logits, true, eps=1e-7):
