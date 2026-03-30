@@ -104,11 +104,6 @@ echo "========================================"
 OUTPUT_DIR=$HOME/ClimateNet/results/top75_run_$SLURM_JOB_ID
 mkdir -p $OUTPUT_DIR
 
-echo "top50pct | alpha=12 beta=1 | $(date) | job=$SLURM_JOB_ID" > $OUTPUT_DIR/run_info.txt
-echo "Train : $(ls $SLURM_TMPDIR/climatenet/train | wc -l) fichiers" >> $OUTPUT_DIR/run_info.txt
-echo "Val   : $(ls $SLURM_TMPDIR/climatenet/val   | wc -l) fichiers" >> $OUTPUT_DIR/run_info.txt
-echo "Test  : $(ls $SLURM_TMPDIR/climatenet/test  | wc -l) fichiers" >> $OUTPUT_DIR/run_info.txt
-
 # Entraînement 
 export PYTORCH_ALLOC_CONF=expandable_segments:True
 echo "[$(date)] Démarrage entraînement — top 50% fichiers"
