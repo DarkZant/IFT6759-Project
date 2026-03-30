@@ -19,31 +19,31 @@ class CGNetEncoder(CGNetModule):
     """
 
     def encode(self, input):
-        # Stage 1
+        # Stage 1 — full resolution, extracts low-level features
         output0 = self.level1_0(input)
         output0 = self.level1_1(output0)
         output0 = self.level1_2(output0)
-        inp1 = self.sample1(input)
-        inp2 = self.sample2(input)
+        inp1 = self.sample1(input)  # input downsampled x2, injected at stage 2
+        inp2 = self.sample2(input)  # input downsampled x4, injected at stage 3
 
-        # Stage 2
-        output0_cat = self.b1(torch.cat([output0, inp1], 1))
-        output1_0 = self.level2_0(output0_cat)
-        for i, layer in enumerate(self.level2):
+        # Stage 2 — x2 downsampled, inject inp1 to preserve spatial info
+        output0_cat = self.b1(torch.cat([output0, inp1], 1))  # merge stage1 + raw input
+        output1_0 = self.level2_0(output0_cat)    # downsample block
+        for i, layer in enumerate(self.level2):   # context guided blocks
             if i == 0:
                 output1 = layer(output1_0)
             else:
                 output1 = layer(output1)
-        output1_cat = self.bn_prelu_2(torch.cat([output1, output1_0, inp2], 1))
+        output1_cat = self.bn_prelu_2(torch.cat([output1, output1_0, inp2], 1))  # merge + inject inp2
 
-        # Stage 3
-        output2_0 = self.level3_0(output1_cat)
-        for i, layer in enumerate(self.level3):
+        # Stage 3 — x4 downsampled, deeper features
+        output2_0 = self.level3_0(output1_cat)   # downsample block
+        for i, layer in enumerate(self.level3):  # context guided blocks
             if i == 0:
                 output2 = layer(output2_0)
             else:
                 output2 = layer(output2)
-        output2_cat = self.bn_prelu_3(torch.cat([output2_0, output2], 1))
+        output2_cat = self.bn_prelu_3(torch.cat([output2_0, output2], 1))  # merge skip + deep
 
         return output2_cat  # (B, 256, H/8, W/8)
 
@@ -98,11 +98,11 @@ class CGNetConvLSTM(ConvLSTM):
         # 1. Extract spatial features
         features = []
         for t in range(T):
-            feat = self.encoder.encode(x[:, t]) 
+            feat = self.encoder.encode(x[:, t])
             features.append(feat)
         features = torch.stack(features, dim=1)
 
-        # 2. Temporal 
+        # 2. Temporal
         last_hidden = self.convlstm(features)
 
         # 3. Classify
