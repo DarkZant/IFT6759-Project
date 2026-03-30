@@ -32,11 +32,8 @@ def jaccard_loss(logits, true, eps=1e-7):
     #  Masque géographique
     if _safe_mask is not None:
         mask = _safe_mask.to(logits.device)
-        # Applique le masque sur true : pixels masqués → classe 0 (Background)
         true = true.clone()
         true[:, mask] = 0
-
-        # Applique le masque sur logits : pixels masqués → prédiction certaine Background
         logits = logits.clone()
         logits[:, 1:, mask] = -1e9   
         logits[:, 0, mask]  =  1e9  
