@@ -4,8 +4,8 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 import torch.nn.functional as F
-import xarray as xr
 import numpy as np
+import matplotlib.pyplot as plt
 from attention_unet import AttentionUNet
 from netCDF4 import Dataset as NetCDFDataset
 
@@ -13,6 +13,7 @@ class ClimateNetDataset(Dataset):
     def __init__(self, data_dir):
         self.data_dir = data_dir
 
+        # Corrupted files on dataset
         self.corrupted_files = {
             "data-2002-12-27-01-1_4.nc",
             "data-1997-10-12-01-1_0.nc",
@@ -58,8 +59,6 @@ class ClimateNetDataset(Dataset):
                 data = np.stack(processed_features, axis=0)
 
         except Exception as e:
-            # If the C-library crashes or the file is corrupted, print a warning
-            # and load a DIFFERENT file instead to keep training alive.
             print(f"\nWARNING: Skipping corrupted file {file_path}. Error: {e}")
             # Recursively call __getitem__ with a random different index
             import random
@@ -74,7 +73,7 @@ def evaluate(model, loader, device, num_classes=3):
     """Evaluates the model over the entire dataloader and computes the metrics."""
     model.eval()
 
-    # Initialize metric counters for all classes
+    # Initialize metric
     total_TP = {c: 0 for c in range(num_classes)}
     total_FP = {c: 0 for c in range(num_classes)}
     total_FN = {c: 0 for c in range(num_classes)}
@@ -158,11 +157,20 @@ def train():
     # Gradient Accumulation setup: Effective batch size = batch_size(2) * accumulation_steps(4) = 8
     accumulation_steps = 4
 
+    # Dictionaries to track history for ALL plots
+    history = {
+        'train_loss': [],
+        'train_tc_iou': [], 'train_ar_iou': [], 'test_tc_iou': [], 'test_ar_iou': [],
+        'train_tc_recall': [], 'train_ar_recall': [], 'test_tc_recall': [], 'test_ar_recall': [],
+        'train_tc_precision': [], 'train_ar_precision': [], 'test_tc_precision': [], 'test_ar_precision': [],
+        'train_tc_specificity': [], 'train_ar_specificity': [], 'test_tc_specificity': [], 'test_ar_specificity': []
+    }
+
     print(f"Starting training on device: {device}")
     print(f"Total Train samples: {len(train_dataset)}")
     print(f"Total Test samples: {len(test_dataset)}")
 
-    num_epochs = 25
+    num_epochs = 30
     for epoch in range(num_epochs):
         model.train()
         epoch_loss = 0
@@ -192,12 +200,36 @@ def train():
             if (batch_idx + 1) % 10 == 0:
                 print(f"  Batch {batch_idx + 1}/{len(train_loader)} - Loss: {(loss.item() * accumulation_steps):.4f}")
 
+        avg_train_loss = epoch_loss / len(train_loader)
+        history['train_loss'].append(avg_train_loss)
+
         print(
-            f"\n--- Epoch {epoch + 1}/{num_epochs} Complete | Avg Train Loss: {epoch_loss / len(train_loader):.4f} ---")
+            f"\n--- Epoch {epoch + 1}/{num_epochs} Complete | Avg Train Loss: {avg_train_loss:.4f} ---")
 
         # Evaluate on the entire Train and Test sets
         train_metrics = evaluate(model, train_loader, device)
         test_metrics = evaluate(model, test_loader, device)
+
+        # Log History for ALL Metrics
+        history['train_tc_iou'].append(train_metrics[1]['IoU'])
+        history['train_ar_iou'].append(train_metrics[2]['IoU'])
+        history['test_tc_iou'].append(test_metrics[1]['IoU'])
+        history['test_ar_iou'].append(test_metrics[2]['IoU'])
+
+        history['train_tc_recall'].append(train_metrics[1]['Recall'])
+        history['train_ar_recall'].append(train_metrics[2]['Recall'])
+        history['test_tc_recall'].append(test_metrics[1]['Recall'])
+        history['test_ar_recall'].append(test_metrics[2]['Recall'])
+
+        history['train_tc_precision'].append(train_metrics[1]['Precision'])
+        history['train_ar_precision'].append(train_metrics[2]['Precision'])
+        history['test_tc_precision'].append(test_metrics[1]['Precision'])
+        history['test_ar_precision'].append(test_metrics[2]['Precision'])
+
+        history['train_tc_specificity'].append(train_metrics[1]['Specificity'])
+        history['train_ar_specificity'].append(train_metrics[2]['Specificity'])
+        history['test_tc_specificity'].append(test_metrics[1]['Specificity'])
+        history['test_ar_specificity'].append(test_metrics[2]['Specificity'])
 
         print(" [TRAIN METRICS]")
         print(
@@ -210,6 +242,93 @@ def train():
             f"  TC -> IoU: {test_metrics[1]['IoU']:.4f} | Recall: {test_metrics[1]['Recall']:.4f} | Precision: {test_metrics[1]['Precision']:.4f} | Specificity: {test_metrics[1]['Specificity']:.4f}")
         print(
             f"  AR -> IoU: {test_metrics[2]['IoU']:.4f} | Recall: {test_metrics[2]['Recall']:.4f} | Precision: {test_metrics[2]['Precision']:.4f} | Specificity: {test_metrics[2]['Specificity']:.4f}\n")
+
+    # --- SAVE FINAL MODEL ---
+    print("\n" + "=" * 50)
+    print("SAVING FINAL MODEL")
+    print("=" * 50)
+    torch.save(model.state_dict(), "final_attention_unet.pth")
+    print("Model saved successfully as 'final_attention_unet.pth'.")
+
+    # --- GRAPHS ---
+    print("\nGenerating training plots...")
+    epochs_range = range(1, len(history['train_loss']) + 1)
+
+    os.makedirs('plots', exist_ok=True)
+
+    # Loss Plot
+    plt.figure(figsize=(8, 6))
+    plt.plot(epochs_range, history['train_loss'], label='Train Loss', color='red', marker='o')
+    plt.title('Training Loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join('plots', 'plot_loss.png'))
+    plt.close()
+
+    # IoU Plot
+    plt.figure(figsize=(8, 6))
+    plt.plot(epochs_range, history['train_tc_iou'], label='Train TC IoU', linestyle='--', color='blue')
+    plt.plot(epochs_range, history['train_ar_iou'], label='Train AR IoU', linestyle='--', color='green')
+    plt.plot(epochs_range, history['test_tc_iou'], label='Test TC IoU', marker='o', color='blue')
+    plt.plot(epochs_range, history['test_ar_iou'], label='Test AR IoU', marker='o', color='green')
+    plt.title('Intersection over Union (IoU)')
+    plt.xlabel('Epochs')
+    plt.ylabel('Score')
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join('plots', 'plot_iou.png'))
+    plt.close()
+
+    # Recall Plot
+    plt.figure(figsize=(8, 6))
+    plt.plot(epochs_range, history['train_tc_recall'], label='Train TC Recall', linestyle='--', color='blue')
+    plt.plot(epochs_range, history['train_ar_recall'], label='Train AR Recall', linestyle='--', color='green')
+    plt.plot(epochs_range, history['test_tc_recall'], label='Test TC Recall', marker='o', color='blue')
+    plt.plot(epochs_range, history['test_ar_recall'], label='Test AR Recall', marker='o', color='green')
+    plt.title('Recall')
+    plt.xlabel('Epochs')
+    plt.ylabel('Score')
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join('plots', 'plot_recall.png'))
+    plt.close()
+
+    # Precision Plot
+    plt.figure(figsize=(8, 6))
+    plt.plot(epochs_range, history['train_tc_precision'], label='Train TC Precision', linestyle='--', color='blue')
+    plt.plot(epochs_range, history['train_ar_precision'], label='Train AR Precision', linestyle='--', color='green')
+    plt.plot(epochs_range, history['test_tc_precision'], label='Test TC Precision', marker='o', color='blue')
+    plt.plot(epochs_range, history['test_ar_precision'], label='Test AR Precision', marker='o', color='green')
+    plt.title('Precision')
+    plt.xlabel('Epochs')
+    plt.ylabel('Score')
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join('plots', 'plot_precision.png'))
+    plt.close()
+
+    # Specificity Plot
+    plt.figure(figsize=(8, 6))
+    plt.plot(epochs_range, history['train_tc_specificity'], label='Train TC Specificity', linestyle='--', color='blue')
+    plt.plot(epochs_range, history['train_ar_specificity'], label='Train AR Specificity', linestyle='--', color='green')
+    plt.plot(epochs_range, history['test_tc_specificity'], label='Test TC Specificity', marker='o', color='blue')
+    plt.plot(epochs_range, history['test_ar_specificity'], label='Test AR Specificity', marker='o', color='green')
+    plt.title('Specificity')
+    plt.xlabel('Epochs')
+    plt.ylabel('Score')
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join('plots', 'plot_specificity.png'))
+    plt.close()
+
+    print("\nTraining plots saved at /plots")
 
 
 if __name__ == "__main__":
