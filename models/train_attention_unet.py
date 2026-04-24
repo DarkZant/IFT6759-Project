@@ -3,18 +3,23 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
-import xarray as xr
+import torch.nn.functional as F
 import numpy as np
+import matplotlib.pyplot as plt
 from attention_unet import AttentionUNet
+from netCDF4 import Dataset as NetCDFDataset
 
 class ClimateNetDataset(Dataset):
     def __init__(self, data_dir):
         self.data_dir = data_dir
 
+        # Corrupted files on dataset
         self.corrupted_files = {
             "data-2002-12-27-01-1_4.nc",
             "data-1997-10-12-01-1_0.nc",
-            "data-2001-10-29-01-1_3.nc"
+            "data-2001-10-29-01-1_3.nc",
+            "data-2000-04-17-01-1_5.nc",
+            "data-2008-10-03-01-1_0.nc"
         }
 
         if os.path.exists(data_dir):
@@ -28,22 +33,47 @@ class ClimateNetDataset(Dataset):
 
     def __getitem__(self, idx):
         file_path = os.path.join(self.data_dir, self.valid_files[idx])
+        target_shape = (768, 1152)
+        feature_keys = [
+            'TMQ', 'U850', 'V850', 'UBOT', 'VBOT', 'QREFHT', 'PS', 'PSL',
+            'T200', 'T500', 'PRECT', 'TS', 'TREFHT', 'Z1000', 'Z200', 'ZBOT',
+            'WS850', 'WSBOT', 'VRT850', 'VRTBOT'
+        ]
 
-        with xr.open_dataset(file_path, engine='h5netcdf') as ds:
-            labels = ds['LABELS'].squeeze().values.astype(np.int64)
-            ds_features = ds.drop_vars('LABELS')
-            data = ds_features.to_array().squeeze().values
+        try:
+            with NetCDFDataset(file_path, 'r') as nc:
+                labels = nc.variables['LABELS'][:].squeeze().astype(np.int64)
 
+                processed_features = []
+                for k in feature_keys:
+                    if k in nc.variables:
+                        var_data = nc.variables[k][:].squeeze()
+                        if len(var_data.shape) == 2:
+                            if var_data.shape != target_shape:
+                                var_data = var_data[:target_shape[0], :target_shape[1]]
+                            processed_features.append(var_data)
+
+                while len(processed_features) < 20:
+                    processed_features.append(np.zeros(target_shape))
+
+                data = np.stack(processed_features, axis=0)
+
+        except Exception as e:
+            print(f"\nWARNING: Skipping corrupted file {file_path}. Error: {e}")
+            # Recursively call __getitem__ with a random different index
+            import random
+            return self.__getitem__(random.randint(0, len(self.valid_files) - 1))
+
+        # Standardize
         data = (data - data.mean(axis=(1, 2), keepdims=True)) / (data.std(axis=(1, 2), keepdims=True) + 1e-7)
 
         return torch.from_numpy(data).float(), torch.from_numpy(labels)
-
 
 def evaluate(model, loader, device, num_classes=3):
     """Evaluates the model over the entire dataloader and computes the metrics."""
     model.eval()
 
-    # Initialize metric counters for all classes
+    # Initialize metric
     total_TP = {c: 0 for c in range(num_classes)}
     total_FP = {c: 0 for c in range(num_classes)}
     total_FN = {c: 0 for c in range(num_classes)}
@@ -79,12 +109,33 @@ def evaluate(model, loader, device, num_classes=3):
     return metrics
 
 
+class DiceLoss(nn.Module):
+    """Calculates Multiclass Dice Loss directly optimizing for IoU"""
+
+    def __init__(self, smooth=1e-6):
+        super(DiceLoss, self).__init__()
+        self.smooth = smooth
+
+    def forward(self, logits, true):
+        probs = F.softmax(logits, dim=1)
+        # Convert true labels to one-hot encoding [Batch, Classes, Height, Width]
+        true_1hot = F.one_hot(true, num_classes=probs.shape[1]).permute(0, 3, 1, 2).float()
+
+        # Calculate intersection and cardinality across spatial and batch dimensions
+        dims = (0, 2, 3)
+        intersection = torch.sum(probs * true_1hot, dims)
+        cardinality = torch.sum(probs + true_1hot, dims)
+
+        dice = (2. * intersection + self.smooth) / (cardinality + self.smooth)
+        return 1.0 - dice.mean()
+
+
 def train():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    train_dir = os.path.abspath(os.path.join(current_dir, "../shared_CN_B/climatenet/train"))
-    test_dir = os.path.abspath(os.path.join(current_dir, "../shared_CN_B/climatenet/test"))
+    train_dir = os.path.abspath(os.path.join(current_dir, "../shared_CN_B/climatenet_engineered/train"))
+    test_dir = os.path.abspath(os.path.join(current_dir, "../shared_CN_B/climatenet_engineered/test"))
 
     # Create Datasets and DataLoaders
     train_dataset = ClimateNetDataset(train_dir)
@@ -93,53 +144,192 @@ def train():
     train_loader = DataLoader(train_dataset, batch_size=2, shuffle=True, num_workers=0)
     test_loader = DataLoader(test_dataset, batch_size=2, shuffle=False, num_workers=0)
 
-    model = AttentionUNet(in_channels=16, out_channels=3).to(device)
+    # Initialize model
+    model = AttentionUNet(in_channels=20, out_channels=3).to(device)
 
-    weights = torch.tensor([0.5, 5.0, 2.0]).to(device) # [0.1, 10.0, 3.0]
-    criterion = nn.CrossEntropyLoss(weight=weights)
+    # Combined Loss setup
+    weights = torch.tensor([0.5, 5.0, 2.0]).to(device)
+    ce_loss_fn = nn.CrossEntropyLoss(weight=weights)
+    dice_loss_fn = DiceLoss()
+
     optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+    # Gradient Accumulation setup: Effective batch size = batch_size(2) * accumulation_steps(4) = 8
+    accumulation_steps = 4
+
+    # Dictionaries to track history for ALL plots
+    history = {
+        'train_loss': [],
+        'train_tc_iou': [], 'train_ar_iou': [], 'test_tc_iou': [], 'test_ar_iou': [],
+        'train_tc_recall': [], 'train_ar_recall': [], 'test_tc_recall': [], 'test_ar_recall': [],
+        'train_tc_precision': [], 'train_ar_precision': [], 'test_tc_precision': [], 'test_ar_precision': [],
+        'train_tc_specificity': [], 'train_ar_specificity': [], 'test_tc_specificity': [], 'test_ar_specificity': []
+    }
 
     print(f"Starting training on device: {device}")
     print(f"Total Train samples: {len(train_dataset)}")
     print(f"Total Test samples: {len(test_dataset)}")
 
-    num_epochs = 15
+    num_epochs = 30
     for epoch in range(num_epochs):
         model.train()
         epoch_loss = 0
+        optimizer.zero_grad()  # Zero gradients at the start of the epoch
 
         for batch_idx, (images, labels) in enumerate(train_loader):
             images, labels = images.to(device), labels.to(device)
 
-            optimizer.zero_grad()
             outputs = model(images)
-            loss = criterion(outputs, labels)
-            loss.backward()
-            optimizer.step()
 
-            epoch_loss += loss.item()
+            # Combine Cross-Entropy and Dice Loss
+            loss_ce = ce_loss_fn(outputs, labels)
+            loss_dice = dice_loss_fn(outputs, labels)
+            loss = loss_ce + loss_dice
+
+            # Normalize loss for accumulation
+            loss = loss / accumulation_steps
+            loss.backward()
+
+            # Only update weights after accumulating gradients for 'accumulation_steps' batches
+            if (batch_idx + 1) % accumulation_steps == 0 or (batch_idx + 1) == len(train_loader):
+                optimizer.step()
+                optimizer.zero_grad()
+
+            epoch_loss += (loss.item() * accumulation_steps)  # Keep true loss scale for logging
 
             if (batch_idx + 1) % 10 == 0:
-                print(f"  Batch {batch_idx + 1}/{len(train_loader)} - Loss: {loss.item():.4f}")
+                print(f"  Batch {batch_idx + 1}/{len(train_loader)} - Loss: {(loss.item() * accumulation_steps):.4f}")
+
+        avg_train_loss = epoch_loss / len(train_loader)
+        history['train_loss'].append(avg_train_loss)
 
         print(
-            f"\n--- Epoch {epoch + 1}/{num_epochs} Complete | Avg Train Loss: {epoch_loss / len(train_loader):.4f} ---")
+            f"\n--- Epoch {epoch + 1}/{num_epochs} Complete | Avg Train Loss: {avg_train_loss:.4f} ---")
 
         # Evaluate on the entire Train and Test sets
         train_metrics = evaluate(model, train_loader, device)
         test_metrics = evaluate(model, test_loader, device)
 
-        print("  [TRAIN METRICS]")
+        # Log History for ALL Metrics
+        history['train_tc_iou'].append(train_metrics[1]['IoU'])
+        history['train_ar_iou'].append(train_metrics[2]['IoU'])
+        history['test_tc_iou'].append(test_metrics[1]['IoU'])
+        history['test_ar_iou'].append(test_metrics[2]['IoU'])
+
+        history['train_tc_recall'].append(train_metrics[1]['Recall'])
+        history['train_ar_recall'].append(train_metrics[2]['Recall'])
+        history['test_tc_recall'].append(test_metrics[1]['Recall'])
+        history['test_ar_recall'].append(test_metrics[2]['Recall'])
+
+        history['train_tc_precision'].append(train_metrics[1]['Precision'])
+        history['train_ar_precision'].append(train_metrics[2]['Precision'])
+        history['test_tc_precision'].append(test_metrics[1]['Precision'])
+        history['test_ar_precision'].append(test_metrics[2]['Precision'])
+
+        history['train_tc_specificity'].append(train_metrics[1]['Specificity'])
+        history['train_ar_specificity'].append(train_metrics[2]['Specificity'])
+        history['test_tc_specificity'].append(test_metrics[1]['Specificity'])
+        history['test_ar_specificity'].append(test_metrics[2]['Specificity'])
+
+        print(" [TRAIN METRICS]")
         print(
             f"  TC -> IoU: {train_metrics[1]['IoU']:.4f} | Recall: {train_metrics[1]['Recall']:.4f} | Precision: {train_metrics[1]['Precision']:.4f} | Specificity: {train_metrics[1]['Specificity']:.4f}")
         print(
             f"  AR -> IoU: {train_metrics[2]['IoU']:.4f} | Recall: {train_metrics[2]['Recall']:.4f} | Precision: {train_metrics[2]['Precision']:.4f} | Specificity: {train_metrics[2]['Specificity']:.4f}")
 
-        print("  [TEST METRICS]")
+        print(" [TEST METRICS]")
         print(
             f"  TC -> IoU: {test_metrics[1]['IoU']:.4f} | Recall: {test_metrics[1]['Recall']:.4f} | Precision: {test_metrics[1]['Precision']:.4f} | Specificity: {test_metrics[1]['Specificity']:.4f}")
         print(
             f"  AR -> IoU: {test_metrics[2]['IoU']:.4f} | Recall: {test_metrics[2]['Recall']:.4f} | Precision: {test_metrics[2]['Precision']:.4f} | Specificity: {test_metrics[2]['Specificity']:.4f}\n")
+
+    # --- SAVE FINAL MODEL ---
+    print("\n" + "=" * 50)
+    print("SAVING FINAL MODEL")
+    print("=" * 50)
+    torch.save(model.state_dict(), "final_attention_unet.pth")
+    print("Model saved successfully as 'final_attention_unet.pth'.")
+
+    # --- GRAPHS ---
+    print("\nGenerating training plots...")
+    epochs_range = range(1, len(history['train_loss']) + 1)
+
+    os.makedirs('plots', exist_ok=True)
+
+    # Loss Plot
+    plt.figure(figsize=(8, 6))
+    plt.plot(epochs_range, history['train_loss'], label='Train Loss', color='red', marker='o')
+    plt.title('Training Loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join('plots', 'plot_loss.png'))
+    plt.close()
+
+    # IoU Plot
+    plt.figure(figsize=(8, 6))
+    plt.plot(epochs_range, history['train_tc_iou'], label='Train TC IoU', linestyle='--', color='blue')
+    plt.plot(epochs_range, history['train_ar_iou'], label='Train AR IoU', linestyle='--', color='green')
+    plt.plot(epochs_range, history['test_tc_iou'], label='Test TC IoU', marker='o', color='blue')
+    plt.plot(epochs_range, history['test_ar_iou'], label='Test AR IoU', marker='o', color='green')
+    plt.title('Intersection over Union (IoU)')
+    plt.xlabel('Epochs')
+    plt.ylabel('Score')
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join('plots', 'plot_iou.png'))
+    plt.close()
+
+    # Recall Plot
+    plt.figure(figsize=(8, 6))
+    plt.plot(epochs_range, history['train_tc_recall'], label='Train TC Recall', linestyle='--', color='blue')
+    plt.plot(epochs_range, history['train_ar_recall'], label='Train AR Recall', linestyle='--', color='green')
+    plt.plot(epochs_range, history['test_tc_recall'], label='Test TC Recall', marker='o', color='blue')
+    plt.plot(epochs_range, history['test_ar_recall'], label='Test AR Recall', marker='o', color='green')
+    plt.title('Recall')
+    plt.xlabel('Epochs')
+    plt.ylabel('Score')
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join('plots', 'plot_recall.png'))
+    plt.close()
+
+    # Precision Plot
+    plt.figure(figsize=(8, 6))
+    plt.plot(epochs_range, history['train_tc_precision'], label='Train TC Precision', linestyle='--', color='blue')
+    plt.plot(epochs_range, history['train_ar_precision'], label='Train AR Precision', linestyle='--', color='green')
+    plt.plot(epochs_range, history['test_tc_precision'], label='Test TC Precision', marker='o', color='blue')
+    plt.plot(epochs_range, history['test_ar_precision'], label='Test AR Precision', marker='o', color='green')
+    plt.title('Precision')
+    plt.xlabel('Epochs')
+    plt.ylabel('Score')
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join('plots', 'plot_precision.png'))
+    plt.close()
+
+    # Specificity Plot
+    plt.figure(figsize=(8, 6))
+    plt.plot(epochs_range, history['train_tc_specificity'], label='Train TC Specificity', linestyle='--', color='blue')
+    plt.plot(epochs_range, history['train_ar_specificity'], label='Train AR Specificity', linestyle='--', color='green')
+    plt.plot(epochs_range, history['test_tc_specificity'], label='Test TC Specificity', marker='o', color='blue')
+    plt.plot(epochs_range, history['test_ar_specificity'], label='Test AR Specificity', marker='o', color='green')
+    plt.title('Specificity')
+    plt.xlabel('Epochs')
+    plt.ylabel('Score')
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join('plots', 'plot_specificity.png'))
+    plt.close()
+
+    print("\nTraining plots saved at /plots")
+
 
 if __name__ == "__main__":
     train()

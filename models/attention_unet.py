@@ -11,13 +11,24 @@ class ConvBlock(nn.Module):
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
             nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1, bias=False),
-            nn.BatchNorm2d(out_channels),
-            nn.ReLU(inplace=True)
+            nn.BatchNorm2d(out_channels)
         )
+        self.relu = nn.ReLU(inplace=True)
+
+        # 1x1 convolution to align dimensions for the residual skip connection
+        self.shortcut = nn.Sequential()
+        if in_channels != out_channels:
+            self.shortcut = nn.Sequential(
+                nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=1, bias=False),
+                nn.BatchNorm2d(out_channels)
+            )
 
     def forward(self, x):
-        return self.conv(x)
-
+        residual = self.shortcut(x)
+        out = self.conv(x)
+        out += residual  # The residual connection
+        out = self.relu(out)
+        return out
 
 class AttentionBlock(nn.Module):
     """
@@ -56,7 +67,7 @@ class AttentionBlock(nn.Module):
 
 
 class AttentionUNet(nn.Module):
-    def __init__(self, in_channels=16, out_channels=3, features=[16, 32, 64, 128]):
+    def __init__(self, in_channels=20, out_channels=3, features=[16, 32, 64, 128]):
         super(AttentionUNet, self).__init__()
         self.Maxpool = nn.MaxPool2d(kernel_size=2, stride=2)
 
