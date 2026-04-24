@@ -74,45 +74,7 @@ class ClimateNetSequenceDataset(Dataset):
         # x shape: (T, C, H, W)
         x = torch.stack(frames, dim=0)
         return x, labels
-
-    # def __getitem__(self, idx):
-    #     start = self.sequences[idx]
-    #     frames = []
-    #     labels = None
-
-    #     for t in range(self.seq_len):
-    #         path = os.path.join(self.data_dir, self.valid_files[start + t])
-    #         with xr.open_dataset(path, engine='h5netcdf') as ds:
-    #             if t == self.seq_len - 1:
-    #                 labels = torch.from_numpy(
-    #                     ds['LABELS'].squeeze().values.astype(np.int64)
-    #                 )
-    #             frame = ds[self.variables].to_array().squeeze().values
-
-    #             # Détecter si c'est un gap avec le fichier précédent
-    #             if t > 0 and not self._same_day(
-    #                 self.valid_files[start + t - 1],
-    #                 self.valid_files[start + t]
-    #             ):
-    #                 # Gap détecté → frame de zéros (background)
-    #                 frame = np.zeros_like(frame)
-    #             else:
-    #                 frame = (frame - frame.mean(axis=(1, 2), keepdims=True)) / \
-    #                         (frame.std(axis=(1, 2), keepdims=True) + 1e-7)
-
-    #             frames.append(torch.from_numpy(frame).float())
-
-    #     x = torch.stack(frames, dim=0)
-    #     return x, labels
-
-    # def _same_day(self, file1, file2):
-    #     """Vérifie si deux fichiers sont du même jour."""
-    #     parts1 = file1.split('-')
-    #     parts2 = file2.split('-')
-    #     date1 = f"{parts1[1]}-{parts1[2]}-{parts1[3]}"
-    #     date2 = f"{parts2[1]}-{parts2[2]}-{parts2[3]}"
-    #     return date1 == date2
-
+    
 
 # Evaluation
 def evaluate(model, loader, device, num_classes=3):
@@ -168,46 +130,14 @@ def train():
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=2)
     test_loader  = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=2)
 
-    ## Choix du modèle : 
-    ## Pour expériences 1 à 10 (pour 2 et 10, in_channels=5 et 16 respectivement)
-    # model = ConvLSTMUNet(in_channels=4, out_channels=3).to(device) 
-    ## Pour expériences 11 à 17 (in_channels=4, sauf pour expérience 14 et 15 où in_channels=16)
-    # model = ConvLSTMUNetGC(in_channels=4, out_channels=3).to(device) 
-    ## Pour expérience 18
-    # model = ConvLSTMUNetFullLSTM(in_channels=4, out_channels=3).to(device) 
-    ## Pour expérience 19 et 20
-    # model = ConvLSTMPure(in_channels=4, out_channels=3, hidden_channels=[8, 16, 8]).to(device) 
-
+    # Pour expérience 14
     model = ConvLSTMUNetGC(in_channels=16, out_channels=3).to(device)
 
     # Mêmes poids que l'Attention UNet pour comparaison équitable
     weights = torch.tensor([0.5, 5.0, 2.0]).to(device)
     criterion = nn.CrossEntropyLoss(weight=weights)
 
-    # def jaccard_loss(outputs, targets, num_classes=3, weights=None, eps=1e-7):
-    #     outputs = torch.softmax(outputs, dim=1)
-    #     loss = 0.0
-    #     for cls in range(num_classes):
-    #         pred = outputs[:, cls]
-    #         target = (targets == cls).float()
-    #         intersection = (pred * target).sum()
-    #         union = (pred + target - pred * target).sum()
-    #         cls_loss = 1 - (intersection + eps) / (union + eps)
-    #         w = weights[cls] if weights is not None else 1.0
-    #         loss += w * cls_loss
-    #     return loss / num_classes
-
-    # weights_jaccard = [0.5, 5.0, 2.0]
-    # criterion = lambda outputs, targets: jaccard_loss(outputs, targets, weights=weights_jaccard)
-
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
-
-    # # Ajouter après optimizer
-    # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-    #     optimizer, 
-    #     T_max=args.epochs,  # descend jusqu'à la dernière époque
-    #     eta_min=1e-5         # LR minimum
-    # )
 
     # Mixed precision : réduit l'usage mémoire GPU d'environ 50%
     scaler = GradScaler()
@@ -241,8 +171,6 @@ def train():
 
         avg_loss = epoch_loss / len(train_loader)
         print(f"\n--- Epoch {epoch+1}/{args.epochs} | Avg Loss: {avg_loss:.4f} ---")
-
-        # scheduler.step() # added
     
         # Évaluation pour train et test
         train_metrics = evaluate(model, train_loader, device)
