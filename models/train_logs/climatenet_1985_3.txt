@@ -1,0 +1,794 @@
+
+The following have been reloaded with a version change:
+  1) python/3.11.5 => python/3.10.13
+
+Lmod has detected the following error: These module(s) or extension(s) exist
+but cannot be loaded as requested: "openmpi/4.1.1"
+   Try: "module spider openmpi/4.1.1" to see how to load the module(s).
+
+
+
+Lmod Warning:
+-------------------------------------------------------------------------------
+The following dependent module(s) are not currently loaded: python/3.11.5
+(required by: ipython-kernel/3.11)
+-------------------------------------------------------------------------------
+
+
+
+created virtual environment CPython3.10.13.final.0-64 in 1180ms
+  creator CPython3Posix(dest=/localscratch/etiennemb.1985.0/env, clear=False, no_vcs_ignore=False, global=False)
+  seeder FromAppData(download=False, pip=bundle, setuptools=bundle, wheel=bundle, via=copy, app_data_dir=/home/etiennemb/.local/share/virtualenv)
+    added seed packages: pip==26.0.1+computecanada, setuptools==80.7.1, wheel==0.46.3+computecanada
+  activators BashActivator,CShellActivator,FishActivator,NushellActivator,PowerShellActivator,PythonActivator
+Looking in links: /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/gentoo2023/x86-64-v3, /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/gentoo2023/generic, /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/gentoo2023/x86-64-v3/netCDF4-1.7.1+computecanada-cp310-cp310-linux_x86_64.whl
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/gentoo2023/x86-64-v3/torch-2.6.0+computecanada-cp310-cp310-linux_x86_64.whl
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/gentoo2023/generic/torchvision-0.21.0+computecanada-cp310-cp310-linux_x86_64.whl
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/gentoo2023/generic/scipy-1.15.1+computecanada-cp310-cp310-linux_x86_64.whl
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic/xarray-2026.2.0+computecanada-py3-none-any.whl
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic/h5netcdf-1.8.1+computecanada-py3-none-any.whl
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/gentoo2023/x86-64-v3/h5py-3.12.0+computecanada-cp310-cp310-linux_x86_64.whl
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/gentoo2023/x86-64-v3/cftime-1.6.5+computecanada-cp310-cp310-linux_x86_64.whl (from netCDF4)
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic/certifi-2026.2.25+computecanada-py3-none-any.whl (from netCDF4)
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/gentoo2023/generic/numpy-1.26.4+computecanada-cp310-cp310-linux_x86_64.whl (from netCDF4)
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic/filelock-3.25.2+computecanada-py3-none-any.whl (from torch)
+Requirement already satisfied: typing-extensions>=4.10.0 in /cvmfs/soft.computecanada.ca/easybuild/software/2023/x86-64-v3/Compiler/gcccore/ipykernel/2026a/lib/python3.10/site-packages (from torch) (4.15.0+computecanada)
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic/networkx-3.6.1+computecanada-py3-none-any.whl (from torch)
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic/jinja2-3.1.6+computecanada-py3-none-any.whl (from torch)
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic/fsspec-2026.2.0+computecanada-py3-none-any.whl (from torch)
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic/sympy-1.13.1+computecanada-py3-none-any.whl (from torch)
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic/mpmath-1.3.0+computecanada-py3-none-any.whl (from sympy==1.13.1->torch)
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/gentoo2023/x86-64-v3/Pillow_SIMD-9.5.0.post2+computecanada-cp310-cp310-linux_x86_64.whl (from torchvision)
+INFO: pip is looking at multiple versions of xarray to determine which version is compatible with other requirements. This could take a while.
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic/xarray-2026.1.0+computecanada-py3-none-any.whl
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic/xarray-2025.12.0+computecanada-py3-none-any.whl
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic/xarray-2025.10.1+computecanada-py3-none-any.whl
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic/xarray-2025.9.0+computecanada-py3-none-any.whl
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic/xarray-2025.8.0+computecanada-py3-none-any.whl
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic/xarray-2025.7.1+computecanada-py3-none-any.whl
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic/xarray-2025.3.0+computecanada-py3-none-any.whl
+Requirement already satisfied: packaging>=23.2 in /cvmfs/soft.computecanada.ca/easybuild/software/2023/x86-64-v3/Compiler/gcccore/ipykernel/2026a/lib/python3.10/site-packages (from xarray) (26.0+computecanada)
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/gentoo2023/x86-64-v3/pandas-2.2.3+computecanada-cp310-cp310-linux_x86_64.whl (from xarray)
+Requirement already satisfied: python-dateutil>=2.8.2 in /cvmfs/soft.computecanada.ca/easybuild/software/2023/x86-64-v3/Compiler/gcccore/ipykernel/2026a/lib/python3.10/site-packages (from pandas>=2.1->xarray) (2.9.0.post0+computecanada)
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic/pytz-2026.1.post1+computecanada-py2.py3-none-any.whl (from pandas>=2.1->xarray)
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic/tzdata-2025.3+computecanada-py2.py3-none-any.whl (from pandas>=2.1->xarray)
+Requirement already satisfied: six>=1.5 in /cvmfs/soft.computecanada.ca/easybuild/software/2023/x86-64-v3/Compiler/gcccore/ipykernel/2026a/lib/python3.10/site-packages (from python-dateutil>=2.8.2->pandas>=2.1->xarray) (1.17.0+computecanada)
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic/MarkupSafe-2.1.5+computecanada-cp310-cp310-linux_x86_64.whl (from jinja2->torch)
+INFO: pip is looking at multiple versions of networkx to determine which version is compatible with other requirements. This could take a while.
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic/networkx-3.6+computecanada-py3-none-any.whl (from torch)
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic/networkx-3.5+computecanada-py3-none-any.whl (from torch)
+Processing /cvmfs/soft.computecanada.ca/custom/python/wheelhouse/generic/networkx-3.4.2+computecanada-py3-none-any.whl (from torch)
+Installing collected packages: pytz, mpmath, tzdata, sympy, pillow-simd, numpy, networkx, MarkupSafe, fsspec, filelock, certifi, scipy, pandas, jinja2, h5py, h5netcdf, cftime, xarray, torch, netCDF4, torchvision
+
+Successfully installed MarkupSafe-2.1.5+computecanada certifi-2026.2.25+computecanada cftime-1.6.5+computecanada filelock-3.25.2+computecanada fsspec-2026.2.0+computecanada h5netcdf-1.8.1+computecanada h5py-3.12.0+computecanada jinja2-3.1.6+computecanada mpmath-1.3.0+computecanada netCDF4-1.7.1+computecanada networkx-3.4.2+computecanada numpy-1.26.4+computecanada pandas-2.2.3+computecanada pillow-simd-9.5.0.post2+computecanada pytz-2026.1.post1+computecanada scipy-1.15.1+computecanada sympy-1.13.1+computecanada torch-2.6.0+computecanada torchvision-0.21.0+computecanada tzdata-2025.3+computecanada xarray-2025.3.0+computecanada
+This is Array Task 3. Training on feature set: cg_engi
+Starting training on device: cuda
+Total Train samples: 393
+Total Test samples: 61
+Training with feature set "cg_engi" for 25 epochs with learning rate 0.001
+  Batch 10/197 - Loss: 1.9684
+  Batch 20/197 - Loss: 1.8662
+  Batch 30/197 - Loss: 1.7142
+  Batch 40/197 - Loss: 1.6722
+  Batch 50/197 - Loss: 1.5583
+  Batch 60/197 - Loss: 1.5063
+  Batch 70/197 - Loss: 1.4253
+  Batch 80/197 - Loss: 1.3753
+  Batch 90/197 - Loss: 1.3354
+  Batch 100/197 - Loss: 1.3031
+  Batch 110/197 - Loss: 1.2524
+  Batch 120/197 - Loss: 1.2545
+  Batch 130/197 - Loss: 1.2275
+  Batch 140/197 - Loss: 1.2074
+  Batch 150/197 - Loss: 1.1271
+  Batch 160/197 - Loss: 1.1819
+  Batch 170/197 - Loss: 1.1593
+  Batch 180/197 - Loss: 1.0996
+  Batch 190/197 - Loss: 1.0588
+
+--- Epoch 1/25 Complete | Avg Train Loss: 1.3983 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.2740 | Recall: 0.6410 | Precision: 0.3237 | Specificity: 0.9938
+  AR -> IoU: 0.2872 | Recall: 0.7547 | Precision: 0.3168 | Specificity: 0.9020
+ [TEST METRICS]
+  TC -> IoU: 0.2983 | Recall: 0.6125 | Precision: 0.3677 | Specificity: 0.9942
+  AR -> IoU: 0.2792 | Recall: 0.7482 | Precision: 0.3082 | Specificity: 0.9005
+
+  Batch 10/197 - Loss: 1.0064
+  Batch 20/197 - Loss: 1.0358
+  Batch 30/197 - Loss: 0.9864
+  Batch 40/197 - Loss: 1.0371
+  Batch 50/197 - Loss: 0.9644
+  Batch 60/197 - Loss: 1.2344
+  Batch 70/197 - Loss: 0.9560
+  Batch 80/197 - Loss: 1.0426
+  Batch 90/197 - Loss: 1.0255
+  Batch 100/197 - Loss: 0.9356
+  Batch 110/197 - Loss: 0.9080
+  Batch 120/197 - Loss: 0.9382
+  Batch 130/197 - Loss: 0.8699
+  Batch 140/197 - Loss: 0.8510
+  Batch 150/197 - Loss: 0.8734
+  Batch 160/197 - Loss: 0.8344
+  Batch 170/197 - Loss: 0.9308
+  Batch 180/197 - Loss: 0.9417
+  Batch 190/197 - Loss: 0.9465
+
+--- Epoch 2/25 Complete | Avg Train Loss: 0.9686 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.2054 | Recall: 0.7835 | Precision: 0.2178 | Specificity: 0.9870
+  AR -> IoU: 0.3290 | Recall: 0.5710 | Precision: 0.4371 | Specificity: 0.9557
+ [TEST METRICS]
+  TC -> IoU: 0.2253 | Recall: 0.7606 | Precision: 0.2425 | Specificity: 0.9869
+  AR -> IoU: 0.3307 | Recall: 0.5794 | Precision: 0.4353 | Specificity: 0.9555
+
+  Batch 10/197 - Loss: 0.8758
+  Batch 20/197 - Loss: 0.8616
+  Batch 30/197 - Loss: 0.9044
+  Batch 40/197 - Loss: 0.8385
+  Batch 50/197 - Loss: 0.8288
+  Batch 60/197 - Loss: 0.8167
+  Batch 70/197 - Loss: 0.7906
+  Batch 80/197 - Loss: 0.8974
+  Batch 90/197 - Loss: 0.9386
+  Batch 100/197 - Loss: 0.8776
+  Batch 110/197 - Loss: 0.8037
+  Batch 120/197 - Loss: 0.8048
+  Batch 130/197 - Loss: 0.8925
+  Batch 140/197 - Loss: 1.0325
+  Batch 150/197 - Loss: 0.8668
+  Batch 160/197 - Loss: 0.8287
+  Batch 170/197 - Loss: 0.8220
+  Batch 180/197 - Loss: 0.8140
+  Batch 190/197 - Loss: 0.8487
+
+--- Epoch 3/25 Complete | Avg Train Loss: 0.8574 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.2925 | Recall: 0.6856 | Precision: 0.3378 | Specificity: 0.9938
+  AR -> IoU: 0.3658 | Recall: 0.6454 | Precision: 0.4578 | Specificity: 0.9540
+ [TEST METRICS]
+  TC -> IoU: 0.3211 | Recall: 0.6572 | Precision: 0.3857 | Specificity: 0.9942
+  AR -> IoU: 0.3651 | Recall: 0.6380 | Precision: 0.4605 | Specificity: 0.9557
+
+  Batch 10/197 - Loss: 0.9197
+  Batch 20/197 - Loss: 0.7512
+  Batch 30/197 - Loss: 0.9063
+  Batch 40/197 - Loss: 0.8256
+  Batch 50/197 - Loss: 0.8367
+  Batch 60/197 - Loss: 0.7677
+  Batch 70/197 - Loss: 1.0034
+  Batch 80/197 - Loss: 0.7323
+  Batch 90/197 - Loss: 0.7562
+  Batch 100/197 - Loss: 0.8548
+  Batch 110/197 - Loss: 0.7090
+  Batch 120/197 - Loss: 0.7313
+  Batch 130/197 - Loss: 0.7144
+  Batch 140/197 - Loss: 0.6983
+  Batch 150/197 - Loss: 0.7214
+  Batch 160/197 - Loss: 0.7804
+  Batch 170/197 - Loss: 0.6940
+  Batch 180/197 - Loss: 0.7954
+  Batch 190/197 - Loss: 0.9361
+
+--- Epoch 4/25 Complete | Avg Train Loss: 0.7978 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.2231 | Recall: 0.7931 | Precision: 0.2369 | Specificity: 0.9882
+  AR -> IoU: 0.3727 | Recall: 0.6754 | Precision: 0.4541 | Specificity: 0.9511
+ [TEST METRICS]
+  TC -> IoU: 0.2539 | Recall: 0.7691 | Precision: 0.2748 | Specificity: 0.9888
+  AR -> IoU: 0.3676 | Recall: 0.6667 | Precision: 0.4503 | Specificity: 0.9518
+
+  Batch 10/197 - Loss: 0.7558
+  Batch 20/197 - Loss: 0.8234
+  Batch 30/197 - Loss: 0.6542
+  Batch 40/197 - Loss: 0.8516
+  Batch 50/197 - Loss: 0.7448
+  Batch 60/197 - Loss: 0.7540
+  Batch 70/197 - Loss: 0.8128
+  Batch 80/197 - Loss: 0.7567
+  Batch 90/197 - Loss: 0.7412
+  Batch 100/197 - Loss: 0.7129
+  Batch 110/197 - Loss: 0.8903
+  Batch 120/197 - Loss: 0.6279
+  Batch 130/197 - Loss: 0.6716
+  Batch 140/197 - Loss: 0.7328
+  Batch 150/197 - Loss: 0.7491
+  Batch 160/197 - Loss: 1.3283
+  Batch 170/197 - Loss: 0.8079
+  Batch 180/197 - Loss: 0.7338
+  Batch 190/197 - Loss: 0.6616
+
+--- Epoch 5/25 Complete | Avg Train Loss: 0.7558 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.2542 | Recall: 0.7730 | Precision: 0.2747 | Specificity: 0.9905
+  AR -> IoU: 0.3709 | Recall: 0.6790 | Precision: 0.4497 | Specificity: 0.9500
+ [TEST METRICS]
+  TC -> IoU: 0.2808 | Recall: 0.7414 | Precision: 0.3113 | Specificity: 0.9909
+  AR -> IoU: 0.3563 | Recall: 0.6567 | Precision: 0.4378 | Specificity: 0.9500
+
+  Batch 10/197 - Loss: 0.7864
+  Batch 20/197 - Loss: 0.7813
+  Batch 30/197 - Loss: 0.6724
+  Batch 40/197 - Loss: 0.6729
+  Batch 50/197 - Loss: 0.6343
+  Batch 60/197 - Loss: 0.7521
+  Batch 70/197 - Loss: 0.6942
+  Batch 80/197 - Loss: 0.7470
+  Batch 90/197 - Loss: 1.0910
+  Batch 100/197 - Loss: 0.6685
+  Batch 110/197 - Loss: 0.6824
+  Batch 120/197 - Loss: 0.5503
+  Batch 130/197 - Loss: 0.7603
+  Batch 140/197 - Loss: 0.7643
+  Batch 150/197 - Loss: 0.7359
+  Batch 160/197 - Loss: 0.7779
+  Batch 170/197 - Loss: 0.7891
+  Batch 180/197 - Loss: 0.5734
+  Batch 190/197 - Loss: 0.7666
+
+--- Epoch 6/25 Complete | Avg Train Loss: 0.7277 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.3546 | Recall: 0.6191 | Precision: 0.4536 | Specificity: 0.9965
+  AR -> IoU: 0.3776 | Recall: 0.6892 | Precision: 0.4552 | Specificity: 0.9503
+ [TEST METRICS]
+  TC -> IoU: 0.3649 | Recall: 0.5791 | Precision: 0.4966 | Specificity: 0.9968
+  AR -> IoU: 0.3712 | Recall: 0.6755 | Precision: 0.4517 | Specificity: 0.9514
+
+  Batch 10/197 - Loss: 0.6835
+  Batch 20/197 - Loss: 0.7214
+  Batch 30/197 - Loss: 0.7793
+  Batch 40/197 - Loss: 0.7099
+  Batch 50/197 - Loss: 0.7181
+  Batch 60/197 - Loss: 0.5904
+  Batch 70/197 - Loss: 0.7267
+  Batch 80/197 - Loss: 0.6637
+  Batch 90/197 - Loss: 0.7739
+  Batch 100/197 - Loss: 0.6351
+  Batch 110/197 - Loss: 0.6389
+  Batch 120/197 - Loss: 0.6524
+  Batch 130/197 - Loss: 0.7215
+  Batch 140/197 - Loss: 0.6109
+  Batch 150/197 - Loss: 0.6769
+  Batch 160/197 - Loss: 0.8218
+  Batch 170/197 - Loss: 0.7118
+  Batch 180/197 - Loss: 0.6674
+  Batch 190/197 - Loss: 0.7645
+
+--- Epoch 7/25 Complete | Avg Train Loss: 0.7129 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.2730 | Recall: 0.7441 | Precision: 0.3013 | Specificity: 0.9920
+  AR -> IoU: 0.3745 | Recall: 0.7099 | Precision: 0.4422 | Specificity: 0.9461
+ [TEST METRICS]
+  TC -> IoU: 0.2941 | Recall: 0.7124 | Precision: 0.3337 | Specificity: 0.9921
+  AR -> IoU: 0.3683 | Recall: 0.6912 | Precision: 0.4409 | Specificity: 0.9481
+
+  Batch 10/197 - Loss: 0.6660
+  Batch 20/197 - Loss: 0.6950
+  Batch 30/197 - Loss: 0.7091
+  Batch 40/197 - Loss: 0.6243
+  Batch 50/197 - Loss: 0.6430
+  Batch 60/197 - Loss: 0.6045
+  Batch 70/197 - Loss: 0.5981
+  Batch 80/197 - Loss: 0.6431
+  Batch 90/197 - Loss: 0.6021
+  Batch 100/197 - Loss: 0.6134
+  Batch 110/197 - Loss: 0.6748
+  Batch 120/197 - Loss: 0.7175
+  Batch 130/197 - Loss: 0.7003
+  Batch 140/197 - Loss: 0.7993
+  Batch 150/197 - Loss: 0.5784
+  Batch 160/197 - Loss: 0.8279
+  Batch 170/197 - Loss: 0.6090
+  Batch 180/197 - Loss: 1.4003
+  Batch 190/197 - Loss: 0.6636
+
+--- Epoch 8/25 Complete | Avg Train Loss: 0.7040 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.3557 | Recall: 0.4767 | Precision: 0.5835 | Specificity: 0.9984
+  AR -> IoU: 0.3655 | Recall: 0.7528 | Precision: 0.4153 | Specificity: 0.9362
+ [TEST METRICS]
+  TC -> IoU: 0.3443 | Recall: 0.4328 | Precision: 0.6273 | Specificity: 0.9986
+  AR -> IoU: 0.3557 | Recall: 0.7325 | Precision: 0.4088 | Specificity: 0.9373
+
+  Batch 10/197 - Loss: 0.7424
+  Batch 20/197 - Loss: 0.6684
+  Batch 30/197 - Loss: 0.5993
+  Batch 40/197 - Loss: 0.7137
+  Batch 50/197 - Loss: 1.2431
+  Batch 60/197 - Loss: 0.7499
+  Batch 70/197 - Loss: 1.3756
+  Batch 80/197 - Loss: 0.6209
+  Batch 90/197 - Loss: 0.6096
+  Batch 100/197 - Loss: 0.5553
+  Batch 110/197 - Loss: 0.5888
+  Batch 120/197 - Loss: 0.6720
+  Batch 130/197 - Loss: 0.6210
+  Batch 140/197 - Loss: 0.5515
+  Batch 150/197 - Loss: 0.6357
+  Batch 160/197 - Loss: 0.6639
+  Batch 170/197 - Loss: 0.6302
+  Batch 180/197 - Loss: 0.6620
+  Batch 190/197 - Loss: 1.0509
+
+--- Epoch 9/25 Complete | Avg Train Loss: 0.6980 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.3622 | Recall: 0.5759 | Precision: 0.4940 | Specificity: 0.9973
+  AR -> IoU: 0.3807 | Recall: 0.6704 | Precision: 0.4683 | Specificity: 0.9542
+ [TEST METRICS]
+  TC -> IoU: 0.3631 | Recall: 0.5311 | Precision: 0.5344 | Specificity: 0.9974
+  AR -> IoU: 0.3692 | Recall: 0.6534 | Precision: 0.4591 | Specificity: 0.9544
+
+  Batch 10/197 - Loss: 0.5416
+  Batch 20/197 - Loss: 0.6947
+  Batch 30/197 - Loss: 0.5480
+  Batch 40/197 - Loss: 0.5308
+  Batch 50/197 - Loss: 0.6344
+  Batch 60/197 - Loss: 0.6292
+  Batch 70/197 - Loss: 0.6897
+  Batch 80/197 - Loss: 0.7399
+  Batch 90/197 - Loss: 0.6875
+  Batch 100/197 - Loss: 0.6443
+  Batch 110/197 - Loss: 0.6231
+  Batch 120/197 - Loss: 0.7867
+  Batch 130/197 - Loss: 0.7253
+  Batch 140/197 - Loss: 0.6902
+  Batch 150/197 - Loss: 0.6542
+  Batch 160/197 - Loss: 0.8213
+  Batch 170/197 - Loss: 0.9131
+  Batch 180/197 - Loss: 0.6792
+  Batch 190/197 - Loss: 0.5631
+
+--- Epoch 10/25 Complete | Avg Train Loss: 0.6853 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.3650 | Recall: 0.5941 | Precision: 0.4863 | Specificity: 0.9971
+  AR -> IoU: 0.3967 | Recall: 0.6233 | Precision: 0.5218 | Specificity: 0.9656
+ [TEST METRICS]
+  TC -> IoU: 0.3627 | Recall: 0.5332 | Precision: 0.5314 | Specificity: 0.9974
+  AR -> IoU: 0.3823 | Recall: 0.6014 | Precision: 0.5120 | Specificity: 0.9660
+
+  Batch 10/197 - Loss: 0.5851
+  Batch 20/197 - Loss: 0.6772
+  Batch 30/197 - Loss: 0.7362
+  Batch 40/197 - Loss: 0.5317
+  Batch 50/197 - Loss: 0.6829
+  Batch 60/197 - Loss: 0.5393
+  Batch 70/197 - Loss: 1.3647
+  Batch 80/197 - Loss: 0.7073
+  Batch 90/197 - Loss: 0.6619
+  Batch 100/197 - Loss: 0.7624
+  Batch 110/197 - Loss: 0.5796
+  Batch 120/197 - Loss: 0.6117
+  Batch 130/197 - Loss: 0.8113
+  Batch 140/197 - Loss: 0.7456
+  Batch 150/197 - Loss: 0.5955
+  Batch 160/197 - Loss: 0.5427
+  Batch 170/197 - Loss: 0.5719
+  Batch 180/197 - Loss: 0.5638
+  Batch 190/197 - Loss: 0.6231
+
+--- Epoch 11/25 Complete | Avg Train Loss: 0.6802 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.3412 | Recall: 0.7079 | Precision: 0.3970 | Specificity: 0.9950
+  AR -> IoU: 0.4010 | Recall: 0.6657 | Precision: 0.5021 | Specificity: 0.9602
+ [TEST METRICS]
+  TC -> IoU: 0.3480 | Recall: 0.6317 | Precision: 0.4366 | Specificity: 0.9955
+  AR -> IoU: 0.3893 | Recall: 0.6399 | Precision: 0.4985 | Specificity: 0.9619
+
+  Batch 10/197 - Loss: 0.6501
+  Batch 20/197 - Loss: 0.7391
+  Batch 30/197 - Loss: 0.4449
+  Batch 40/197 - Loss: 0.5543
+  Batch 50/197 - Loss: 0.4768
+  Batch 60/197 - Loss: 0.7734
+  Batch 70/197 - Loss: 0.7121
+  Batch 80/197 - Loss: 0.6805
+  Batch 90/197 - Loss: 0.7159
+  Batch 100/197 - Loss: 0.6471
+  Batch 110/197 - Loss: 0.5516
+  Batch 120/197 - Loss: 0.7072
+  Batch 130/197 - Loss: 0.7106
+  Batch 140/197 - Loss: 0.6628
+  Batch 150/197 - Loss: 0.6675
+  Batch 160/197 - Loss: 0.8928
+  Batch 170/197 - Loss: 1.1075
+  Batch 180/197 - Loss: 0.5427
+  Batch 190/197 - Loss: 0.8628
+
+--- Epoch 12/25 Complete | Avg Train Loss: 0.6718 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.3757 | Recall: 0.6006 | Precision: 0.5008 | Specificity: 0.9972
+  AR -> IoU: 0.3911 | Recall: 0.7293 | Precision: 0.4576 | Specificity: 0.9479
+ [TEST METRICS]
+  TC -> IoU: 0.3723 | Recall: 0.5465 | Precision: 0.5388 | Specificity: 0.9974
+  AR -> IoU: 0.3803 | Recall: 0.7075 | Precision: 0.4513 | Specificity: 0.9490
+
+  Batch 10/197 - Loss: 1.0457
+  Batch 20/197 - Loss: 0.6944
+  Batch 30/197 - Loss: 0.6655
+  Batch 40/197 - Loss: 0.5742
+  Batch 50/197 - Loss: 0.5952
+  Batch 60/197 - Loss: 0.7008
+  Batch 70/197 - Loss: 0.6503
+  Batch 80/197 - Loss: 0.5636
+  Batch 90/197 - Loss: 0.7530
+  Batch 100/197 - Loss: 0.7408
+  Batch 110/197 - Loss: 0.5601
+  Batch 120/197 - Loss: 0.5995
+  Batch 130/197 - Loss: 0.6264
+  Batch 140/197 - Loss: 0.6969
+  Batch 150/197 - Loss: 0.8298
+  Batch 160/197 - Loss: 0.5279
+  Batch 170/197 - Loss: 0.6015
+  Batch 180/197 - Loss: 0.7373
+  Batch 190/197 - Loss: 0.7340
+
+--- Epoch 13/25 Complete | Avg Train Loss: 0.6669 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.2940 | Recall: 0.7632 | Precision: 0.3234 | Specificity: 0.9926
+  AR -> IoU: 0.4053 | Recall: 0.6693 | Precision: 0.5068 | Specificity: 0.9608
+ [TEST METRICS]
+  TC -> IoU: 0.3152 | Recall: 0.6856 | Precision: 0.3684 | Specificity: 0.9935
+  AR -> IoU: 0.3872 | Recall: 0.6563 | Precision: 0.4856 | Specificity: 0.9588
+
+  Batch 10/197 - Loss: 0.5995
+  Batch 20/197 - Loss: 0.7167
+  Batch 30/197 - Loss: 0.6166
+  Batch 40/197 - Loss: 0.6536
+  Batch 50/197 - Loss: 0.6788
+  Batch 60/197 - Loss: 0.6711
+  Batch 70/197 - Loss: 0.6194
+  Batch 80/197 - Loss: 0.6628
+  Batch 90/197 - Loss: 1.2016
+  Batch 100/197 - Loss: 0.6814
+  Batch 110/197 - Loss: 0.5985
+  Batch 120/197 - Loss: 0.5730
+  Batch 130/197 - Loss: 0.7781
+  Batch 140/197 - Loss: 0.7599
+  Batch 150/197 - Loss: 0.5602
+  Batch 160/197 - Loss: 0.6052
+  Batch 170/197 - Loss: 0.5250
+  Batch 180/197 - Loss: 0.7367
+  Batch 190/197 - Loss: 0.6328
+
+--- Epoch 14/25 Complete | Avg Train Loss: 0.6672 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.3597 | Recall: 0.6760 | Precision: 0.4347 | Specificity: 0.9959
+  AR -> IoU: 0.4064 | Recall: 0.6509 | Precision: 0.5197 | Specificity: 0.9638
+ [TEST METRICS]
+  TC -> IoU: 0.3629 | Recall: 0.6136 | Precision: 0.4703 | Specificity: 0.9962
+  AR -> IoU: 0.3894 | Recall: 0.6175 | Precision: 0.5132 | Specificity: 0.9653
+
+  Batch 10/197 - Loss: 0.6453
+  Batch 20/197 - Loss: 0.8277
+  Batch 30/197 - Loss: 0.9634
+  Batch 40/197 - Loss: 0.6459
+  Batch 50/197 - Loss: 0.7737
+  Batch 60/197 - Loss: 0.7673
+  Batch 70/197 - Loss: 0.6077
+  Batch 80/197 - Loss: 0.5205
+  Batch 90/197 - Loss: 0.6034
+  Batch 100/197 - Loss: 0.6129
+  Batch 110/197 - Loss: 0.5966
+  Batch 120/197 - Loss: 0.7025
+  Batch 130/197 - Loss: 0.6716
+  Batch 140/197 - Loss: 0.7348
+  Batch 150/197 - Loss: 0.5607
+  Batch 160/197 - Loss: 0.5801
+  Batch 170/197 - Loss: 0.7084
+  Batch 180/197 - Loss: 0.6543
+  Batch 190/197 - Loss: 0.5568
+
+--- Epoch 15/25 Complete | Avg Train Loss: 0.6585 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.3739 | Recall: 0.6633 | Precision: 0.4615 | Specificity: 0.9964
+  AR -> IoU: 0.4040 | Recall: 0.7163 | Precision: 0.4810 | Specificity: 0.9535
+ [TEST METRICS]
+  TC -> IoU: 0.3634 | Recall: 0.5729 | Precision: 0.4984 | Specificity: 0.9968
+  AR -> IoU: 0.3818 | Recall: 0.6826 | Precision: 0.4643 | Specificity: 0.9534
+
+  Batch 10/197 - Loss: 0.5756
+  Batch 20/197 - Loss: 0.6565
+  Batch 30/197 - Loss: 0.6588
+  Batch 40/197 - Loss: 0.7306
+  Batch 50/197 - Loss: 0.7062
+  Batch 60/197 - Loss: 0.6498
+  Batch 70/197 - Loss: 1.0852
+  Batch 80/197 - Loss: 0.5086
+  Batch 90/197 - Loss: 0.6009
+  Batch 100/197 - Loss: 0.6796
+  Batch 110/197 - Loss: 0.6940
+  Batch 120/197 - Loss: 0.6381
+  Batch 130/197 - Loss: 0.6508
+  Batch 140/197 - Loss: 0.6517
+  Batch 150/197 - Loss: 0.6124
+  Batch 160/197 - Loss: 0.7372
+  Batch 170/197 - Loss: 0.5830
+  Batch 180/197 - Loss: 0.8550
+  Batch 190/197 - Loss: 0.5942
+
+--- Epoch 16/25 Complete | Avg Train Loss: 0.6622 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.3575 | Recall: 0.6581 | Precision: 0.4390 | Specificity: 0.9961
+  AR -> IoU: 0.4091 | Recall: 0.6527 | Precision: 0.5229 | Specificity: 0.9641
+ [TEST METRICS]
+  TC -> IoU: 0.3635 | Recall: 0.6091 | Precision: 0.4741 | Specificity: 0.9963
+  AR -> IoU: 0.3862 | Recall: 0.6134 | Precision: 0.5105 | Specificity: 0.9652
+
+  Batch 10/197 - Loss: 0.7016
+  Batch 20/197 - Loss: 0.7310
+  Batch 30/197 - Loss: 0.5785
+  Batch 40/197 - Loss: 0.7882
+  Batch 50/197 - Loss: 0.6495
+  Batch 60/197 - Loss: 0.5447
+  Batch 70/197 - Loss: 0.5203
+  Batch 80/197 - Loss: 0.6879
+  Batch 90/197 - Loss: 0.6376
+  Batch 100/197 - Loss: 0.6235
+  Batch 110/197 - Loss: 0.5321
+  Batch 120/197 - Loss: 0.6124
+  Batch 130/197 - Loss: 0.6898
+  Batch 140/197 - Loss: 0.4434
+  Batch 150/197 - Loss: 0.5748
+  Batch 160/197 - Loss: 0.6666
+  Batch 170/197 - Loss: 0.5568
+  Batch 180/197 - Loss: 0.7465
+  Batch 190/197 - Loss: 0.5903
+
+--- Epoch 17/25 Complete | Avg Train Loss: 0.6542 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.3751 | Recall: 0.6860 | Precision: 0.4528 | Specificity: 0.9962
+  AR -> IoU: 0.4058 | Recall: 0.7240 | Precision: 0.4800 | Specificity: 0.9528
+ [TEST METRICS]
+  TC -> IoU: 0.3671 | Recall: 0.6003 | Precision: 0.4860 | Specificity: 0.9965
+  AR -> IoU: 0.3850 | Recall: 0.6888 | Precision: 0.4660 | Specificity: 0.9532
+
+  Batch 10/197 - Loss: 0.7090
+  Batch 20/197 - Loss: 0.6517
+  Batch 30/197 - Loss: 0.5978
+  Batch 40/197 - Loss: 0.7396
+  Batch 50/197 - Loss: 0.6454
+  Batch 60/197 - Loss: 0.6069
+  Batch 70/197 - Loss: 0.6215
+  Batch 80/197 - Loss: 0.7087
+  Batch 90/197 - Loss: 0.6468
+  Batch 100/197 - Loss: 0.5269
+  Batch 110/197 - Loss: 0.5766
+  Batch 120/197 - Loss: 0.4654
+  Batch 130/197 - Loss: 0.7368
+  Batch 140/197 - Loss: 0.7160
+  Batch 150/197 - Loss: 0.6502
+  Batch 160/197 - Loss: 0.6390
+  Batch 170/197 - Loss: 0.7040
+  Batch 180/197 - Loss: 0.5544
+  Batch 190/197 - Loss: 0.6023
+
+--- Epoch 18/25 Complete | Avg Train Loss: 0.6467 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.3492 | Recall: 0.7225 | Precision: 0.4032 | Specificity: 0.9950
+  AR -> IoU: 0.4142 | Recall: 0.6414 | Precision: 0.5390 | Specificity: 0.9670
+ [TEST METRICS]
+  TC -> IoU: 0.3407 | Recall: 0.6331 | Precision: 0.4246 | Specificity: 0.9953
+  AR -> IoU: 0.3839 | Recall: 0.5985 | Precision: 0.5171 | Specificity: 0.9669
+
+  Batch 10/197 - Loss: 0.5766
+  Batch 20/197 - Loss: 0.8284
+  Batch 30/197 - Loss: 0.8370
+  Batch 40/197 - Loss: 0.5476
+  Batch 50/197 - Loss: 0.6311
+  Batch 60/197 - Loss: 0.5530
+  Batch 70/197 - Loss: 0.6040
+  Batch 80/197 - Loss: 0.6123
+  Batch 90/197 - Loss: 0.6227
+  Batch 100/197 - Loss: 1.0400
+  Batch 110/197 - Loss: 0.5620
+  Batch 120/197 - Loss: 0.5176
+  Batch 130/197 - Loss: 0.4925
+  Batch 140/197 - Loss: 0.6322
+  Batch 150/197 - Loss: 0.5947
+  Batch 160/197 - Loss: 0.5685
+  Batch 170/197 - Loss: 0.7746
+  Batch 180/197 - Loss: 0.5804
+  Batch 190/197 - Loss: 0.5182
+
+--- Epoch 19/25 Complete | Avg Train Loss: 0.6425 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.3921 | Recall: 0.6651 | Precision: 0.4885 | Specificity: 0.9968
+  AR -> IoU: 0.4147 | Recall: 0.7224 | Precision: 0.4934 | Specificity: 0.9553
+ [TEST METRICS]
+  TC -> IoU: 0.3646 | Recall: 0.5730 | Precision: 0.5006 | Specificity: 0.9968
+  AR -> IoU: 0.3859 | Recall: 0.6834 | Precision: 0.4699 | Specificity: 0.9543
+
+  Batch 10/197 - Loss: 0.5845
+  Batch 20/197 - Loss: 0.5449
+  Batch 30/197 - Loss: 0.6923
+  Batch 40/197 - Loss: 0.6620
+  Batch 50/197 - Loss: 0.5643
+  Batch 60/197 - Loss: 0.5875
+  Batch 70/197 - Loss: 0.5242
+  Batch 80/197 - Loss: 0.5546
+  Batch 90/197 - Loss: 0.6947
+  Batch 100/197 - Loss: 0.6830
+  Batch 110/197 - Loss: 0.4869
+  Batch 120/197 - Loss: 0.6757
+  Batch 130/197 - Loss: 0.6376
+  Batch 140/197 - Loss: 0.5290
+  Batch 150/197 - Loss: 0.6571
+  Batch 160/197 - Loss: 0.7010
+  Batch 170/197 - Loss: 0.6065
+  Batch 180/197 - Loss: 0.6118
+  Batch 190/197 - Loss: 0.5727
+
+--- Epoch 20/25 Complete | Avg Train Loss: 0.6428 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.3110 | Recall: 0.7872 | Precision: 0.3396 | Specificity: 0.9929
+  AR -> IoU: 0.4138 | Recall: 0.6757 | Precision: 0.5163 | Specificity: 0.9619
+ [TEST METRICS]
+  TC -> IoU: 0.3136 | Recall: 0.7019 | Precision: 0.3618 | Specificity: 0.9932
+  AR -> IoU: 0.3849 | Recall: 0.6388 | Precision: 0.4919 | Specificity: 0.9609
+
+  Batch 10/197 - Loss: 0.4506
+  Batch 20/197 - Loss: 0.6080
+  Batch 30/197 - Loss: 0.5868
+  Batch 40/197 - Loss: 0.6339
+  Batch 50/197 - Loss: 0.8193
+  Batch 60/197 - Loss: 0.5500
+  Batch 70/197 - Loss: 0.5676
+  Batch 80/197 - Loss: 0.5678
+  Batch 90/197 - Loss: 0.5933
+  Batch 100/197 - Loss: 0.5767
+  Batch 110/197 - Loss: 0.7615
+  Batch 120/197 - Loss: 0.5848
+  Batch 130/197 - Loss: 0.5761
+  Batch 140/197 - Loss: 0.5227
+  Batch 150/197 - Loss: 0.6931
+  Batch 160/197 - Loss: 0.5620
+  Batch 170/197 - Loss: 0.6212
+  Batch 180/197 - Loss: 0.6517
+  Batch 190/197 - Loss: 0.5964
+
+--- Epoch 21/25 Complete | Avg Train Loss: 0.6444 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.3922 | Recall: 0.5364 | Precision: 0.5932 | Specificity: 0.9983
+  AR -> IoU: 0.4167 | Recall: 0.7161 | Precision: 0.4992 | Specificity: 0.9567
+ [TEST METRICS]
+  TC -> IoU: 0.3522 | Recall: 0.4530 | Precision: 0.6130 | Specificity: 0.9984
+  AR -> IoU: 0.3913 | Recall: 0.6791 | Precision: 0.4801 | Specificity: 0.9565
+
+  Batch 10/197 - Loss: 0.4740
+  Batch 20/197 - Loss: 0.9003
+  Batch 30/197 - Loss: 0.5817
+  Batch 40/197 - Loss: 0.5676
+  Batch 50/197 - Loss: 0.6862
+  Batch 60/197 - Loss: 0.6547
+  Batch 70/197 - Loss: 0.5073
+  Batch 80/197 - Loss: 0.6809
+  Batch 90/197 - Loss: 0.4998
+  Batch 100/197 - Loss: 0.7484
+  Batch 110/197 - Loss: 0.5650
+  Batch 120/197 - Loss: 0.6721
+  Batch 130/197 - Loss: 0.5339
+  Batch 140/197 - Loss: 0.5256
+  Batch 150/197 - Loss: 0.5260
+  Batch 160/197 - Loss: 0.4567
+  Batch 170/197 - Loss: 1.0277
+  Batch 180/197 - Loss: 0.6451
+  Batch 190/197 - Loss: 0.6111
+
+--- Epoch 22/25 Complete | Avg Train Loss: 0.6391 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.3881 | Recall: 0.6814 | Precision: 0.4741 | Specificity: 0.9965
+  AR -> IoU: 0.4283 | Recall: 0.6786 | Precision: 0.5373 | Specificity: 0.9648
+ [TEST METRICS]
+  TC -> IoU: 0.3578 | Recall: 0.5935 | Precision: 0.4739 | Specificity: 0.9964
+  AR -> IoU: 0.3946 | Recall: 0.6364 | Precision: 0.5095 | Specificity: 0.9637
+
+  Batch 10/197 - Loss: 0.6242
+  Batch 20/197 - Loss: 0.5799
+  Batch 30/197 - Loss: 0.6292
+  Batch 40/197 - Loss: 0.6231
+  Batch 50/197 - Loss: 0.7185
+  Batch 60/197 - Loss: 0.5907
+  Batch 70/197 - Loss: 0.7174
+  Batch 80/197 - Loss: 0.5644
+  Batch 90/197 - Loss: 0.6717
+  Batch 100/197 - Loss: 0.5362
+  Batch 110/197 - Loss: 0.5077
+  Batch 120/197 - Loss: 0.6473
+  Batch 130/197 - Loss: 0.5995
+  Batch 140/197 - Loss: 1.4653
+  Batch 150/197 - Loss: 0.5340
+  Batch 160/197 - Loss: 0.5225
+  Batch 170/197 - Loss: 0.5449
+  Batch 180/197 - Loss: 0.6141
+  Batch 190/197 - Loss: 0.5241
+
+--- Epoch 23/25 Complete | Avg Train Loss: 0.6350 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.3786 | Recall: 0.6909 | Precision: 0.4558 | Specificity: 0.9962
+  AR -> IoU: 0.4167 | Recall: 0.7082 | Precision: 0.5030 | Specificity: 0.9579
+ [TEST METRICS]
+  TC -> IoU: 0.3579 | Recall: 0.5954 | Precision: 0.4729 | Specificity: 0.9963
+  AR -> IoU: 0.3862 | Recall: 0.6635 | Precision: 0.4803 | Specificity: 0.9575
+
+  Batch 10/197 - Loss: 0.5095
+  Batch 20/197 - Loss: 0.6291
+  Batch 30/197 - Loss: 0.5856
+  Batch 40/197 - Loss: 0.4959
+  Batch 50/197 - Loss: 0.5732
+  Batch 60/197 - Loss: 0.8528
+  Batch 70/197 - Loss: 0.6512
+  Batch 80/197 - Loss: 0.6484
+  Batch 90/197 - Loss: 0.5488
+  Batch 100/197 - Loss: 0.8501
+  Batch 110/197 - Loss: 0.5074
+  Batch 120/197 - Loss: 0.6744
+  Batch 130/197 - Loss: 0.5742
+  Batch 140/197 - Loss: 0.5459
+  Batch 150/197 - Loss: 0.6959
+  Batch 160/197 - Loss: 0.5590
+  Batch 170/197 - Loss: 0.7149
+  Batch 180/197 - Loss: 0.6554
+  Batch 190/197 - Loss: 0.6303
+
+--- Epoch 24/25 Complete | Avg Train Loss: 0.6351 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.3443 | Recall: 0.7660 | Precision: 0.3848 | Specificity: 0.9943
+  AR -> IoU: 0.4231 | Recall: 0.6962 | Precision: 0.5188 | Specificity: 0.9611
+ [TEST METRICS]
+  TC -> IoU: 0.3283 | Recall: 0.6704 | Precision: 0.3916 | Specificity: 0.9942
+  AR -> IoU: 0.3886 | Recall: 0.6514 | Precision: 0.4907 | Specificity: 0.9599
+
+  Batch 10/197 - Loss: 0.8343
+  Batch 20/197 - Loss: 0.6601
+  Batch 30/197 - Loss: 0.6310
+  Batch 40/197 - Loss: 0.5014
+  Batch 50/197 - Loss: 0.6358
+  Batch 60/197 - Loss: 0.6069
+  Batch 70/197 - Loss: 0.8439
+  Batch 80/197 - Loss: 0.5346
+  Batch 90/197 - Loss: 1.1060
+  Batch 100/197 - Loss: 0.5976
+  Batch 110/197 - Loss: 0.8384
+  Batch 120/197 - Loss: 0.6732
+  Batch 130/197 - Loss: 0.6004
+  Batch 140/197 - Loss: 0.6714
+  Batch 150/197 - Loss: 0.7163
+  Batch 160/197 - Loss: 0.5435
+  Batch 170/197 - Loss: 0.7694
+  Batch 180/197 - Loss: 0.8019
+  Batch 190/197 - Loss: 0.6534
+
+--- Epoch 25/25 Complete | Avg Train Loss: 0.6272 ---
+Evaluating model...
+ [TRAIN METRICS]
+  TC -> IoU: 0.3978 | Recall: 0.5497 | Precision: 0.5902 | Specificity: 0.9982
+  AR -> IoU: 0.4170 | Recall: 0.7052 | Precision: 0.5050 | Specificity: 0.9584
+ [TEST METRICS]
+  TC -> IoU: 0.3646 | Recall: 0.4753 | Precision: 0.6100 | Specificity: 0.9983
+  AR -> IoU: 0.3800 | Recall: 0.6599 | Precision: 0.4726 | Specificity: 0.9564
+
