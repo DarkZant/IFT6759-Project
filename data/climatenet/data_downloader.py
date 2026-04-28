@@ -28,5 +28,10 @@ def download_split(split):
                         f.write(chunk)
 
 
-download_split("train")
-download_split("test")
+def main():
+    download_split("train")
+    download_split("test")
+
+
+if __name__ == "__main__":
+    main()
