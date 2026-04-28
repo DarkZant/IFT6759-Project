@@ -1,0 +1,48 @@
+{
+    "architecture": "cgnet",
+    "seed": 42,
+    "lr": 0.001,
+    "train_batch_size": 1,
+    "pred_batch_size": 1,
+    "epochs": 15,
+    "fields": {
+        "TMQ": {
+            "mean": 19.21849,
+            "std": 15.81728
+        },
+        "U850": {
+            "mean": 1.55302,
+            "std": 8.29762
+        },
+        "V850": {
+            "mean": 0.25413,
+            "std": 6.23163
+        },
+        "PSL": {
+            "mean": 100814.073,
+            "std": 1461.226
+        },
+        "WS850": {
+            "mean": 8.701,
+            "std": 5.87
+        },
+        "WSBOT": {
+            "mean": 7.478,
+            "std": 4.682
+        },
+        "VRT850": {
+            "mean": 0.002566,
+            "std": 6.978
+        },
+        "VRTBOT": {
+            "mean": -0.001308,
+            "std": 6.201
+        }
+    },
+    "labels": [
+        "Background",
+        "Tropical Cyclone",
+        "Atmospheric River"
+    ],
+    "description": "CGNet with 4 original channels + 4 engineered channels from Lacombe 2023 (WS850, WSBOT, VRT850, VRTBOT)."
+}
