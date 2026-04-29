@@ -12,8 +12,8 @@ from PIL import Image
 
 from typing import Tuple
 
-from models.attention_unet import AttentionUNet
-from models.train_attention_unet import ClimateNetDataset, FeatureSets
+from unets.attention_unet import AttentionUNet
+from unets.train_attention_unet import ClimateNetDataset, FeatureSets
 from post_processing.arco_dataset import ARCOStreamDataset
 
 
