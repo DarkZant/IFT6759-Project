@@ -3,8 +3,6 @@
 ## Abstract
 Extreme weather events such as atmospheric rivers (AR) or tropical cyclones (TC) are becoming increasingly frequent due to global warming, hence the importance of developing automated methods to detect them. This work focuses on the semantic segmentation of TCs and ARs in the ClimateNet dataset, which suffers from severe class imbalance. By building upon the CGNet architecture used by KappSchwoerer et al. (2020) and the work of Lacombe et al. (2023), two approaches were explored: (1) sampling methods involving file and patch selection to reduce class imbalance, and (2) alternative architectures, notably U-Net and ConvLSTM, to better capture the temporal dimension of climate events. The second approach proved more effective, particularly as the U-Net Attention architecture achieved the best overall performance. This architecture yielded a TC IoU of 0.3765, representing a 0.027 increase over the baseline for this class, at the cost of a slight decline in AR segmentation performance. The results obtained confirm that the main challenge remains the extreme class imbalance, particularly for TCs, and that exploring more suitable architectures is more promising than data sampling methods.
 
-Translated with DeepL.com (free version)
-
 ## How to execute
 1. Install Python, we recommend using Python 3.13.x.
 2. Create a virtual env and install the requirements with `pip install -r requirements.txt`.
@@ -17,7 +15,7 @@ Translated with DeepL.com (free version)
 ## Project Structure
 ```text
 ConvLSTM/             # Code and checkpoints for the ConvLSTM models
-baselines/            # Reproduction of the baseline models and results from Kapp-Schwoerer et al. (2020)
+baselines/            # Reproduction of the baseline models and results from Lacombe et al. (2023)
 climatenet/           # Copy of the ClimateNet/climatenet folder in https://github.com/andregraubner/ClimateNet 
 data/                 # ClimateNet dataset, feature engineering and data reduction strategies
 documents/            # Submitted homework PDFs and referenced papers
