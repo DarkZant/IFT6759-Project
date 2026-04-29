@@ -1,0 +1,40 @@
+{
+  "baseline": {
+    "TC": {"IoU": 0.3486, "Precision": 0.4599, "Recall": 0.5903, "Specificity": 0.9961},
+    "AR": {"IoU": 0.3848, "Precision": 0.4543, "Recall": 0.7157, "Specificity": 0.9491}
+  },
+  "experiments": [
+    {
+      "name": "Top 64%",
+      "config": {"data_pct": 0.64, "safe_mask": false},
+      "BG": {"IoU": 0.9265},
+      "TC": {"IoU": 0.3359, "Precision": 0.4345, "Recall": 0.5970, "Specificity": 0.9957},
+      "AR": {"IoU": 0.3807, "Precision": 0.4502, "Recall": 0.7114, "Specificity": 0.9485},
+      "mean_IoU": 0.5477
+    },
+    {
+      "name": "Top 75%",
+      "config": {"data_pct": 0.75, "safe_mask": false},
+      "BG": {"IoU": 0.9355},
+      "TC": {"IoU": 0.3304, "Precision": 0.4391, "Recall": 0.5718, "Specificity": 0.9960},
+      "AR": {"IoU": 0.3914, "Precision": 0.4973, "Recall": 0.6475, "Specificity": 0.9612},
+      "mean_IoU": 0.5524
+    },
+    {
+      "name": "Top 64% + safe_mask",
+      "config": {"data_pct": 0.64, "safe_mask": true},
+      "BG": {"IoU": 0.9194},
+      "TC": {"IoU": 0.3193, "Precision": 0.3812, "Recall": 0.6628, "Specificity": 0.9941},
+      "AR": {"IoU": 0.3648, "Precision": 0.4250, "Recall": 0.7200, "Specificity": 0.9423},
+      "mean_IoU": 0.5345
+    },
+    {
+      "name": "Top 75% + safe_mask",
+      "config": {"data_pct": 0.75, "safe_mask": true},
+      "BG": {"IoU": 0.9338},
+      "TC": {"IoU": 0.3220, "Precision": 0.4061, "Recall": 0.6084, "Specificity": 0.9951},
+      "AR": {"IoU": 0.3910, "Precision": 0.4900, "Recall": 0.6595, "Specificity": 0.9593},
+      "mean_IoU": 0.5489
+    }
+  ]
+}
