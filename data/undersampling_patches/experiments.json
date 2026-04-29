@@ -1,0 +1,180 @@
+{
+  "experiments": [
+    {
+      "id": 1,
+      "name": "BG 10%",
+      "weights": "bg10_4feat/weights.pth",
+      "config": {
+        "patch_size": 128, "bg_ratio": 0.10, "n_features": 4,
+        "features": ["TMQ", "U850", "V850", "PSL"],
+        "tc_oversample": 1, "loss": "jaccard",
+        "ce_weights": null, "jaccard_weights": null,
+        "epochs": 15, "lr": 0.001,
+        "train_batch_size": 16, "pred_batch_size": 32, "stride_eval": 64
+      },
+      "TC": {"IoU": 0.3142, "Precision": 0.4395, "Recall": 0.5244, "Specificity": 0.9963},
+      "AR": {"IoU": 0.3829, "Precision": 0.4984, "Recall": 0.6231, "Specificity": 0.9628}
+    },
+    {
+      "id": 2,
+      "name": "BG 15%",
+      "weights": "bg15_4feat/weights.pth",
+      "config": {
+        "patch_size": 128, "bg_ratio": 0.15, "n_features": 4,
+        "features": ["TMQ", "U850", "V850", "PSL"],
+        "tc_oversample": 1, "loss": "jaccard",
+        "ce_weights": null, "jaccard_weights": null,
+        "epochs": 15, "lr": 0.001,
+        "train_batch_size": 16, "pred_batch_size": 32, "stride_eval": 64
+      },
+      "TC": {"IoU": 0.3005, "Precision": 0.5150, "Recall": 0.4191, "Specificity": 0.9978},
+      "AR": {"IoU": 0.3821, "Precision": 0.5464, "Recall": 0.5597, "Specificity": 0.9725}
+    },
+    {
+      "id": 3,
+      "name": "BG 20%",
+      "selected": true,
+      "weights": "bg20_4feat/weights.pth",
+      "config": {
+        "patch_size": 128, "bg_ratio": 0.20, "n_features": 4,
+        "features": ["TMQ", "U850", "V850", "PSL"],
+        "tc_oversample": 1, "loss": "jaccard",
+        "ce_weights": null, "jaccard_weights": null,
+        "epochs": 15, "lr": 0.001,
+        "train_batch_size": 16, "pred_batch_size": 32, "stride_eval": 64
+      },
+      "TC": {"IoU": 0.3126, "Precision": 0.4538, "Recall": 0.5012, "Specificity": 0.9967},
+      "AR": {"IoU": 0.3854, "Precision": 0.5065, "Recall": 0.6172, "Specificity": 0.9644}
+    },
+    {
+      "id": 4,
+      "name": "BG 25%",
+      "weights": "bg25_4feat/weights.pth",
+      "config": {
+        "patch_size": 128, "bg_ratio": 0.25, "n_features": 4,
+        "features": ["TMQ", "U850", "V850", "PSL"],
+        "tc_oversample": 1, "loss": "jaccard",
+        "ce_weights": null, "jaccard_weights": null,
+        "epochs": 15, "lr": 0.001,
+        "train_batch_size": 16, "pred_batch_size": 32, "stride_eval": 64
+      },
+      "TC": {"IoU": 0.3025, "Precision": 0.3890, "Recall": 0.5764, "Specificity": 0.9950},
+      "AR": {"IoU": 0.3850, "Precision": 0.4890, "Recall": 0.6442, "Specificity": 0.9601}
+    },
+    {
+      "id": 5,
+      "name": "BG 30%",
+      "weights": "bg30_4feat/weights.pth",
+      "config": {
+        "patch_size": 128, "bg_ratio": 0.30, "n_features": 4,
+        "features": ["TMQ", "U850", "V850", "PSL"],
+        "tc_oversample": 1, "loss": "jaccard",
+        "ce_weights": null, "jaccard_weights": null,
+        "epochs": 15, "lr": 0.001,
+        "train_batch_size": 16, "pred_batch_size": 32, "stride_eval": 64
+      },
+      "TC": {"IoU": 0.3061, "Precision": 0.4437, "Recall": 0.4968, "Specificity": 0.9966},
+      "AR": {"IoU": 0.3891, "Precision": 0.4996, "Recall": 0.6377, "Specificity": 0.9622}
+    },
+    {
+      "id": 6,
+      "name": "BG 40%",
+      "weights": "bg40_4feat/weights.pth",
+      "config": {
+        "patch_size": 128, "bg_ratio": 0.40, "n_features": 4,
+        "features": ["TMQ", "U850", "V850", "PSL"],
+        "tc_oversample": 1, "loss": "jaccard",
+        "ce_weights": null, "jaccard_weights": null,
+        "epochs": 15, "lr": 0.001,
+        "train_batch_size": 16, "pred_batch_size": 32, "stride_eval": 64
+      },
+      "TC": {"IoU": 0.3105, "Precision": 0.4422, "Recall": 0.5104, "Specificity": 0.9964},
+      "AR": {"IoU": 0.3680, "Precision": 0.4576, "Recall": 0.6529, "Specificity": 0.9542}
+    },
+    {
+      "id": 7,
+      "name": "BG 20% + all features",
+      "weights": "bg20_16feat/weights.pth",
+      "config": {
+        "patch_size": 128, "bg_ratio": 0.20, "n_features": 16,
+        "features": ["TMQ", "U850", "V850", "UBOT", "VBOT", "QREFHT",
+                     "PS", "PSL", "T200", "T500", "PRECT", "TS",
+                     "TREFHT", "Z1000", "Z200", "ZBOT"],
+        "tc_oversample": 1, "loss": "jaccard",
+        "ce_weights": null, "jaccard_weights": null,
+        "epochs": 15, "lr": 0.001,
+        "train_batch_size": 16, "pred_batch_size": 32, "stride_eval": 64
+      },
+      "TC": {"IoU": 0.3321, "Precision": 0.5211, "Recall": 0.4781, "Specificity": 0.9976},
+      "AR": {"IoU": 0.3893, "Precision": 0.5242, "Recall": 0.6022, "Specificity": 0.9676}
+    },
+    {
+      "id": 8,
+      "name": "BG 20% + TC x6",
+      "weights": "bg20_4feat_TCx6/weights.pth",
+      "config": {
+        "patch_size": 128, "bg_ratio": 0.20, "n_features": 4,
+        "features": ["TMQ", "U850", "V850", "PSL"],
+        "tc_oversample": 6,
+        "augmentation": ["rot90", "rot180", "rot270", "flip_h",
+                         "rot90_flip", "rot180_flip", "rot270_flip"],
+        "loss": "jaccard",
+        "ce_weights": null, "jaccard_weights": null,
+        "epochs": 15, "lr": 0.001,
+        "train_batch_size": 16, "pred_batch_size": 32, "stride_eval": 64
+      },
+      "TC": {"IoU": 0.3071, "Precision": 0.4750, "Recall": 0.4650, "Specificity": 0.9972},
+      "AR": {"IoU": 0.3764, "Precision": 0.5513, "Recall": 0.5427, "Specificity": 0.9738}
+    },
+    {
+      "id": 9,
+      "name": "BG 20% + TC x12",
+      "weights": "bg20_4feat_TCx12/weights.pth",
+      "config": {
+        "patch_size": 128, "bg_ratio": 0.20, "n_features": 4,
+        "features": ["TMQ", "U850", "V850", "PSL"],
+        "tc_oversample": 12,
+        "augmentation": ["rot90", "rot180", "rot270", "flip_h",
+                         "rot90_flip", "rot180_flip", "rot270_flip"],
+        "loss": "jaccard",
+        "ce_weights": null, "jaccard_weights": null,
+        "epochs": 15, "lr": 0.001,
+        "train_batch_size": 16, "pred_batch_size": 32, "stride_eval": 64
+      },
+      "TC": {"IoU": 0.2876, "Precision": 0.4023, "Recall": 0.5021, "Specificity": 0.9959},
+      "AR": {"IoU": 0.3817, "Precision": 0.4995, "Recall": 0.6182, "Specificity": 0.9633}
+    },
+    {
+      "id": 10,
+      "name": "BG 20% + CE ponderee",
+      "weights": "bg20_4feat_weighted_ce/weights.pth",
+      "config": {
+        "patch_size": 128, "bg_ratio": 0.20, "n_features": 4,
+        "features": ["TMQ", "U850", "V850", "PSL"],
+        "tc_oversample": 1,
+        "loss": "cross_entropy",
+        "ce_weights": [1.00, 10.75, 2.98],
+        "epochs": 15, "lr": 0.001,
+        "train_batch_size": 16, "pred_batch_size": 32, "stride_eval": 64
+      },
+      "TC": {"IoU": 0.3185, "Precision": 0.4014, "Recall": 0.6068, "Specificity": 0.9950},
+      "AR": {"IoU": 0.3834, "Precision": 0.5185, "Recall": 0.5955, "Specificity": 0.9672}
+    },
+    {
+      "id": 11,
+      "name": "BG 20% + Jaccard ponderee",
+      "weights": "bg20_4feat_weighted_jaccard/weights.pth",
+      "config": {
+        "patch_size": 128, "bg_ratio": 0.20, "n_features": 4,
+        "features": ["TMQ", "U850", "V850", "PSL"],
+        "tc_oversample": 1,
+        "loss": "weighted_jaccard",
+        "jaccard_weights": [1.00, 10.75, 2.98],
+        "epochs": 15, "lr": 0.001,
+        "train_batch_size": 16, "pred_batch_size": 32, "stride_eval": 64
+      },
+      "TC": {"IoU": 0.2469, "Precision": 0.2731, "Recall": 0.7207, "Specificity": 0.9894},
+      "AR": {"IoU": 0.3588, "Precision": 0.4179, "Recall": 0.7173, "Specificity": 0.9408}
+    }
+  ]
+}
