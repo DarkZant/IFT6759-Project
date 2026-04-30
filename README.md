@@ -7,9 +7,9 @@ Extreme weather events such as atmospheric rivers (AR) or tropical cyclones (TC)
 1. Install Python, we recommend using Python 3.13.x.
 2. Create a virtual env and install the requirements with `pip install -r requirements.txt`.
 3. Download the ClimateNet dataset with `data/climatenet/data_downloader.py`.
-4. Training can be done on the cluster by locating the `.sh` bash files or done locally by running the Python training scripts directly.
-5. Use the newly trained models or locate the saved `.pth` model checkpoint files.
-6. Run inference on ClimateNet eval to evaluate the capabilites of your model.
+4. Training can be done on a SLURM cluster by locating the `.sh` bash files or done locally by running the Python training scripts directly.
+5. Use the newly trained models or locate the saved `.pth` or `.pt` model checkpoint files.
+6. Run inference on ClimateNet eval to evaluate the performance of your model.
 7. Use the post-processing scheme to visualize the predictions of your model.
 
 ## Project Structure
@@ -21,12 +21,17 @@ data/                 # ClimateNet dataset, feature engineering and data reducti
 documents/            # Submitted homework PDFs and referenced papers
 hybrid/               # Hybrid ConvLSTM architectures
 post-processing/      # Post-processing system + results and ERA5 dataset
-results/ConvLSTM/     # ConvLSTM training results
+results/              # Training results and model performance
 unets/                # U-Net training, models and results               
 ```
 
+## Model performances
+### Comparison between *Intersection over Union* (IoU) and *Recall* (Rappel) for different models and data reduction strategies
+![IoU Recall Comparison](results/iou_recall_plot.png)
+
+
 ## Post-processing examples
-### Attention U-Net worlwide AR tracking on September 2022's hurricane season
+### Attention U-Net worldwide AR tracking on September 2022's hurricane season
 ![AR tracking september 2022](post_processing/animations/2022-09-26-29_ar_tracking.gif)
-### Attention U-Net tracking hurricane Erin's evolution in the Carribeans during August 2025 
+### Attention U-Net tracking hurricane Erin's evolution in the Caribbeans during August 2025 
 ![Erin tracking](post_processing/animations/hurricane_erin_tc_tracking.gif)
